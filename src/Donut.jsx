@@ -5,9 +5,6 @@ import { getDonutData } from "./data/data";
 export default function Donut() {
   const [options, _] = useState({
     data: getDonutData(),
-    title: {
-      text: "Portfolio Composition",
-    },
     series: [
       {
         type: "donut",
