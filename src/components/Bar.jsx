@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { AgCharts } from "ag-charts-react";
-import { getBarData } from "./data/data";
+import { getBarData } from "../data/data";
 
 export default function Bar() {
   const [options, _] = useState({

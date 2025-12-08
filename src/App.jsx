@@ -1,9 +1,9 @@
 import './App.css'
-import Landing from "./Landing";
-import Dashboard from './Dashboard';
-import Category from './Category';
+import Landing from "./components/Landing";
+import Dashboard from './components/Dashboard';
+import Category from './components/Category';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Layout from './Layout';
+import Layout from './components/Layout';
 
 function App() {
 
@@ -19,6 +19,7 @@ function App() {
         </Routes>
       </Router>
 
+<Landing/>
       {/* <Landing />
       <Dashboard /> */}
       {/* <Category/> */}

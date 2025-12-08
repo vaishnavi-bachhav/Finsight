@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { AgCharts } from "ag-charts-react";
-import { getDonutData } from "./data/data";
+import { getDonutData } from "../data/data";
 
 export default function Donut() {
   const [options, _] = useState({

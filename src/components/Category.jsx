@@ -1,6 +1,6 @@
 import { DataGrid } from '@mui/x-data-grid';
 import { useState } from 'react';
-import { profiles } from './data/data.js';
+import { profiles } from '../data/data.js';
 
 export default function Category() {
     // -----------------------------
