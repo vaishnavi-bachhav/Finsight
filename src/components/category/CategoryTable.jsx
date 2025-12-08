@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import Button from "react-bootstrap/Button";
-import TypeBadge from "./shared/TypeBadge";
-import CONSTANTS from "../data/constant.js";
+import TypeBadge from "../shared/TypeBadge.jsx";
+import CONSTANTS from "../../data/constant.js";
 
 export default function CategoryTable({ category, onEdit, onDelete }) {
     const [search, setSearch] = useState("");

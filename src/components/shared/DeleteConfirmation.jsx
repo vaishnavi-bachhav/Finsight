@@ -9,7 +9,7 @@ export default function DeleteConfirmation({ show, onCancel, onConfirm, deleteTa
                     <Modal.Title>Confirm Delete</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Are you sure you want to delete <strong>{deleteTarget?.name}</strong>?
+                    You are about to delete <strong>{deleteTarget?.name}</strong>. This action cannot be undone.
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={onCancel}>

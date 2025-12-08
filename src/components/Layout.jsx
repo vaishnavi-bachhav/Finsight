@@ -1,5 +1,5 @@
 import { Container, Row, Col, ListGroup } from "react-bootstrap";
-import { Link, Outlet } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
 
 export default function Layout() {
     return (
@@ -10,9 +10,9 @@ export default function Layout() {
                     <h6 className="fw-bold mb-4 mt-3">Personal Finance Dashboard</h6>
 
                     <ListGroup variant="flush">
-                        <ListGroup.Item action as={Link} to="/">🏠 Home</ListGroup.Item>
-                        <ListGroup.Item action as={Link} to="/transactions">📄 Transactions</ListGroup.Item>
-                        <ListGroup.Item action as={Link} to="/category">📁 Category</ListGroup.Item>
+                        <ListGroup.Item action as={NavLink} to="/">🏠 Home</ListGroup.Item>
+                        <ListGroup.Item action as={NavLink} to="/transactions">📄 Transactions</ListGroup.Item>
+                        <ListGroup.Item action as={NavLink} to="/category">📁 Category</ListGroup.Item>
                     </ListGroup>
                 </Col>
 

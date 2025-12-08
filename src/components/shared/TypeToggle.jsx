@@ -1,7 +1,7 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 
-export default function TypeToggle({ label = "Type", name, formik }) {
+export default function TypeToggle({ label = "Type", name, formik, required = false }) {
     const value = formik.values[name];
 
     const TYPES = [
@@ -21,7 +21,10 @@ export default function TypeToggle({ label = "Type", name, formik }) {
 
     return (
         <Form.Group className="mb-3">
-            <Form.Label className="fw-bold d-block mb-2">{label}</Form.Label>
+            <Form.Label className="fw-bold d-block mb-2">
+                {label}{" "}
+                {required && <span style={{ color: "red" }}>*</span>}
+            </Form.Label>
 
             {/* Hidden input for Formik / FormData compatibility */}
             <input type="hidden" name={name} value={value} />
@@ -29,12 +32,15 @@ export default function TypeToggle({ label = "Type", name, formik }) {
             <div className="d-flex gap-2">
                 {TYPES.map((type) => {
                     const isActive = value === type.key;
-
                     return (
                         <Button
                             key={type.key}
                             type="button"
-                            variant={isActive ? `outline-${type.key === "income" ? "success" : "danger"}` : "outline-secondary"}
+                            variant={
+                                isActive
+                                    ? `outline-${type.key === "income" ? "success" : "danger"}`
+                                    : "outline-secondary"
+                            }
                             className="rounded-pill d-flex align-items-center px-3 py-1"
                             onClick={() => formik.setFieldValue(name, type.key)}
                             style={{
@@ -57,7 +63,6 @@ export default function TypeToggle({ label = "Type", name, formik }) {
                             >
                                 {type.icon}
                             </span>
-
                             {type.label}
                         </Button>
                     );

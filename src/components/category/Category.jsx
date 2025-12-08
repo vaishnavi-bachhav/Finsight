@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import { profiles } from '../data/data.js';
+import { profiles } from '../../data/data.js';
 import CategoryTable from './CategoryTable.jsx';
-import DeleteConfirmation from './DeleteConfirmation.jsx';
+import DeleteConfirmation from '../shared/DeleteConfirmation.jsx';
 import Button from "react-bootstrap/Button";
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import { Formik } from "formik";
 import * as Yup from "yup";
-import CONSTANTS from '../data/constant.js';
-import FormInput from './shared/FormInput.jsx';
-import TypeToggle from './shared/TypeToggle.jsx';
+import CONSTANTS from '../../data/constant.js';
+import FormInput from '../shared/FormInput.jsx';
+import TypeToggle from '../shared/TypeToggle.jsx';
 
 export default function Category() {
     const [show, setShow] = useState(false);
@@ -51,7 +51,7 @@ export default function Category() {
 
     const handleEdit = (category) => {
         setEditingProfile(category);
-        setIcon(category.icon || '');
+        setIcon(category.icon || CONSTANTS.DEFAULT_CATEGORY_IMAGE);
         setShow(true);
     };
 
@@ -124,7 +124,14 @@ export default function Category() {
     return (
         <>
             <div className="d-flex justify-content-end mb-3">
-                <Button variant="primary" onClick={() => setShow(true)}>
+                <Button
+                    variant="primary"
+                    onClick={() => {
+                        setEditingProfile(null);
+                        setIcon('');
+                        setShow(true);
+                    }}
+                >
                     + Add Category
                 </Button>
             </div>
@@ -156,10 +163,10 @@ export default function Category() {
                             </Modal.Header>
 
                             <Modal.Body>
-                                <p>
+                                <p className='mb-2'>
                                     {editingProfile
-                                        ? "Update the category details below."
-                                        : "Fill out the form below to add a new category."}
+                                        ? "Update your category details and keep your records clean."
+                                        : "Create a new category to better organize your finances."}
                                 </p>
 
                                 {/* Name */}
@@ -169,6 +176,7 @@ export default function Category() {
                                     type="text"
                                     placeholder="Enter category name"
                                     formik={{ values, errors, touched, handleChange }}
+                                    required={true}
                                 />
 
                                 {/* Type – pill toggle buttons */}
@@ -180,11 +188,12 @@ export default function Category() {
                                         touched,
                                         setFieldValue,
                                     }}
+                                    required={true}
                                 />
 
                                 {/* Icon (optional) */}
                                 <Form.Group className="mb-3" controlId="formIcon">
-                                    <Form.Label className='fw-bold'>Icon (optional)</Form.Label>
+                                    <Form.Label className='fw-bold'>Icon</Form.Label>
                                     <Form.Control
                                         type="file"
                                         accept="image/*"
@@ -228,7 +237,7 @@ export default function Category() {
                 show={showDeleteModal}
                 onCancel={() => setShowDeleteModal(false)}
                 onConfirm={handleConfirmDelete}
-                deleteTarget={deleteTarget?.name}
+                deleteTarget={deleteTarget}
             />
 
             <CategoryTable

@@ -1,7 +1,7 @@
 import './App.css'
 import Landing from "./components/Landing";
 import Dashboard from './components/Dashboard';
-import Category from './components/Category';
+import Category from './components/category/Category';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from './components/Layout';
 

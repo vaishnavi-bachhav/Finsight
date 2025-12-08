@@ -9,12 +9,25 @@ import Form from "react-bootstrap/Form";
  * - type: text, number, email, etc.
  * - placeholder: optional
  * - formik: the Formik bag { values, errors, touched, handleChange }
+ * - required: boolean (optional) → shows red asterisk if true
  */
 
-export default function FormInput({ label, name, type = "text", placeholder, formik }) {
+export default function FormInput({
+    label,
+    name,
+    type = "text",
+    placeholder,
+    formik,
+    required = false,
+}) {
     return (
         <Form.Group className="mb-3">
-            {label && <Form.Label className="fw-bold">{label}</Form.Label>}
+            {label && (
+                <Form.Label className="fw-bold">
+                    {label}{" "}
+                    {required && <span style={{ color: "red" }}>*</span>}
+                </Form.Label>
+            )}
 
             <Form.Control
                 name={name}
