@@ -8,6 +8,8 @@ import Form from 'react-bootstrap/Form';
 import { Formik } from "formik";
 import * as Yup from "yup";
 import CONSTANTS from '../data/constant.js';
+import FormInput from './shared/FormInput.jsx';
+import TypeToggle from './shared/TypeToggle.jsx';
 
 export default function Category() {
     const [show, setShow] = useState(false);
@@ -79,7 +81,6 @@ export default function Category() {
 
         const reader = new FileReader();
         reader.onloadend = () => {
-            // reader.result = "data:image/...;base64,AAAA..."
             const base64 = reader.result.split(',')[1];
             setIcon(base64);
         };
@@ -122,9 +123,11 @@ export default function Category() {
 
     return (
         <>
-            <Button variant="primary" onClick={() => setShow(true)}>
-                Add Category
-            </Button>
+            <div className="d-flex justify-content-end mb-3">
+                <Button variant="primary" onClick={() => setShow(true)}>
+                    + Add Category
+                </Button>
+            </div>
 
             {/* Modal */}
             <Modal show={show} onHide={handleClose}>
@@ -160,98 +163,24 @@ export default function Category() {
                                 </p>
 
                                 {/* Name */}
-                                <Form.Group className="mb-3">
-                                    <Form.Label className="fw-bold">Name</Form.Label>
+                                <FormInput
+                                    label="Name"
+                                    name="name"
+                                    type="text"
+                                    placeholder="Enter category name"
+                                    formik={{ values, errors, touched, handleChange }}
+                                />
 
-                                    <Form.Control
-                                        name="name"
-                                        type="text"
-                                        value={values.name}
-                                        placeholder="Enter category name"
-                                        onChange={handleChange}
-                                        isInvalid={touched.name && !!errors.name}
-                                    />
-
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.name}
-                                    </Form.Control.Feedback>
-                                </Form.Group>
-
-                                {/* Type – pill toggle buttons (Formik-controlled) */}
-                                <Form.Group className="mb-3" controlId="formType">
-                                    <Form.Label className="fw-bold d-block mb-2">Type</Form.Label>
-
-                                    {/* keep this if you ever use FormData on the raw form */}
-                                    <input type="hidden" name="type" value={values.type} />
-
-                                    <div className="d-flex gap-2">
-
-                                        {/* Income Button */}
-                                        <Button
-                                            type="button"
-                                            variant={values.type === "income" ? "outline-success" : "outline-secondary"}
-                                            className="rounded-pill d-flex align-items-center px-3 py-1"
-                                            onClick={() => setFieldValue("type", "income")}
-                                            style={{
-                                                borderWidth: values.type === "income" ? 2 : 1,
-                                                backgroundColor: values.type === "income" ? "rgba(25, 135, 84, 0.1)" : "",
-                                            }}
-                                        >
-                                            <span
-                                                className="me-2 d-inline-flex justify-content-center align-items-center"
-                                                style={{
-                                                    width: 22,
-                                                    height: 22,
-                                                    borderRadius: "50%",
-                                                    border: "2px solid #198754",
-                                                    backgroundColor: "rgba(25, 135, 84, 0.08)",
-                                                    color: "#198754",
-                                                    fontSize: 12,
-                                                    fontWeight: 600,
-                                                }}
-                                            >
-                                                ↑
-                                            </span>
-                                            Income
-                                        </Button>
-
-                                        {/* Expense Button */}
-                                        <Button
-                                            type="button"
-                                            variant={values.type === "expense" ? "outline-danger" : "outline-secondary"}
-                                            className="rounded-pill d-flex align-items-center px-3 py-1"
-                                            onClick={() => setFieldValue("type", "expense")}
-                                            style={{
-                                                borderWidth: values.type === "expense" ? 2 : 1,
-                                                backgroundColor: values.type === "expense" ? "rgba(220, 53, 69, 0.1)" : "",
-                                            }}
-                                        >
-                                            <span
-                                                className="me-2 d-inline-flex justify-content-center align-items-center"
-                                                style={{
-                                                    width: 22,
-                                                    height: 22,
-                                                    borderRadius: "50%",
-                                                    border: "2px solid #dc3545",
-                                                    backgroundColor: "rgba(220, 53, 69, 0.08)",
-                                                    color: "#dc3545",
-                                                    fontSize: 12,
-                                                    fontWeight: 600,
-                                                }}
-                                            >
-                                                ↓
-                                            </span>
-                                            Expense
-                                        </Button>
-
-                                    </div>
-
-                                    {touched.type && errors.type && (
-                                        <div className="text-danger mt-1" style={{ fontSize: "0.875rem" }}>
-                                            {errors.type}
-                                        </div>
-                                    )}
-                                </Form.Group>
+                                {/* Type – pill toggle buttons */}
+                                <TypeToggle
+                                    name="type"
+                                    formik={{
+                                        values,
+                                        errors,
+                                        touched,
+                                        setFieldValue,
+                                    }}
+                                />
 
                                 {/* Icon (optional) */}
                                 <Form.Group className="mb-3" controlId="formIcon">
@@ -302,7 +231,6 @@ export default function Category() {
                 deleteTarget={deleteTarget?.name}
             />
 
-            {/* Table (pass onEdit if you want edit from grid) */}
             <CategoryTable
                 category={people}
                 onDelete={confirmDelete}

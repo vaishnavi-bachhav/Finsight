@@ -1,85 +1,92 @@
-import { DataGrid } from '@mui/x-data-grid';
-import Button from 'react-bootstrap/Button';
-import Badge from 'react-bootstrap/Badge';
+import { useMemo, useState } from "react";
+import { DataGrid } from "@mui/x-data-grid";
+import Button from "react-bootstrap/Button";
+import TypeBadge from "./shared/TypeBadge";
+import CONSTANTS from "../data/constant.js";
 
 export default function CategoryTable({ category, onEdit, onDelete }) {
-    // -----------------------------
-    // Split data by type
-    // -----------------------------
-    const incomeRows = category
-        .filter((p) => p.type === 'income')
-        .map((p, idx) => ({ ...p, id: p.id, srNo: idx + 1 }));
+    const [search, setSearch] = useState("");
 
-    const expenseRows = category
-        .filter((p) => p.type === 'expense')
-        .map((p, idx) => ({ ...p, id: p.id, srNo: idx + 1 }));
+    // -----------------------------
+    // Prepare rows with Sr No + id
+    // -----------------------------
+    const rows = useMemo(
+        () =>
+            category.map((p, idx) => ({
+                ...p,
+                id: p.id, // DataGrid requires id
+                srNo: idx + 1,
+            })),
+        [category]
+    );
+
+    // -----------------------------
+    // Search Filter (by name)
+    // -----------------------------
+    const normalizedSearch = search.trim().toLowerCase();
+
+    const filteredRows = useMemo(
+        () =>
+            !normalizedSearch
+                ? rows
+                : rows.filter((row) =>
+                    row.name?.toLowerCase().includes(normalizedSearch)
+                ),
+        [rows, normalizedSearch]
+    );
+
+    // -----------------------------
+    // Split by type AFTER filtering
+    // -----------------------------
+    const incomeRows = filteredRows.filter((r) => r.type === "income");
+    const expenseRows = filteredRows.filter((r) => r.type === "expense");
 
     // -----------------------------
     // DataGrid Columns
     // -----------------------------
     const columns = [
-        { field: 'srNo', headerName: 'Sr No', width: 90, sortable: false, filterable: false },
-
+        // Combined Icon + Name column
         {
-            field: 'icon',
-            headerName: 'Icon',
-            width: 80,
+            field: "category",
+            headerName: "Category",
+            width: 260,
             sortable: false,
             filterable: false,
             renderCell: (params) => {
-                const icon = params.row.icon;
-
-                return icon ? (
-                    <img
-                        src={`data:image/*;base64,${icon}`}
-                        alt="icon"
-                        style={{
-                            width: 32,
-                            height: 32,
-                            borderRadius: 4,
-                            objectFit: 'cover',
-                        }}
-                    />
-                ) : (
-                    <span style={{ fontSize: '0.75rem', color: '#888' }}>
-                        No Icon
-                    </span>
-                );
-            },
-        },
-
-        { field: 'name', headerName: 'Name', width: 150 },
-
-        // -----------------------------
-        // TYPE AS BADGE (Green/Red)
-        // -----------------------------
-        {
-            field: 'type',
-            headerName: 'Type',
-            width: 140,
-            renderCell: (params) => {
-                const type = params.row.type;
-                const isIncome = type === "income";
+                const row = params.row;
+                const icon = row.icon || CONSTANTS.DEFAULT_CATEGORY_IMAGE;
 
                 return (
-                    <Badge
-                        bg={isIncome ? "success" : "danger"}
-                        pill
+                    <div
                         style={{
-                            fontSize: "0.85rem",
-                            padding: "6px 12px",
-                            textTransform: "capitalize",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
                         }}
                     >
-                        {type}
-                    </Badge>
+                        <img
+                            src={`data:image/*;base64,${icon}`}
+                            className="category-icon"
+                            alt="icon"
+                        />
+                        <span style={{ fontSize: "0.95rem", fontWeight: 500 }}>
+                            {row.name}
+                        </span>
+                    </div>
                 );
             },
         },
 
         {
-            field: 'actions',
-            headerName: 'Actions',
+            field: "type",
+            headerName: "Type",
+            width: 140,
+            renderCell: (params) => <TypeBadge type={params.row.type} />,
+        },
+
+        {
+            field: "actions",
+            headerName: "Actions",
             width: 160,
             sortable: false,
             filterable: false,
@@ -108,25 +115,46 @@ export default function CategoryTable({ category, onEdit, onDelete }) {
 
     return (
         <>
+            {/* Filter Input */}
+            <div className="d-flex justify-content-between align-items-center mt-3 mb-2">
+                <h4 className="mb-0">Categories</h4>
+                <input
+                    type="text"
+                    className="form-control"
+                    style={{ maxWidth: 260 }}
+                    placeholder="Search by name..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+            </div>
+
             {/* Income Table */}
-            <h4 className="mt-3 mb-2">Income</h4>
-            <div style={{ height: 300, width: '100%', marginBottom: '2rem' }}>
+            <h5 className="mt-3 mb-2">Income</h5>
+            <div style={{ height: 300, width: "100%", marginBottom: "2rem" }}>
                 <DataGrid
                     rows={incomeRows}
                     columns={columns}
                     pageSize={5}
                     disableRowSelectionOnClick
+                    hideFooterSelectedRowCount
+                    localeText={{
+                        noRowsLabel: "No income categories yet. Try adding one!"
+                    }}
                 />
             </div>
 
             {/* Expense Table */}
-            <h4 className="mt-3 mb-2">Expense</h4>
-            <div style={{ height: 300, width: '100%' }}>
+            <h5 className="mt-3 mb-2">Expense</h5>
+            <div style={{ height: 300, width: "100%" }}>
                 <DataGrid
                     rows={expenseRows}
                     columns={columns}
                     pageSize={5}
                     disableRowSelectionOnClick
+                    hideFooterSelectedRowCount
+                    localeText={{
+                        noRowsLabel: "No expense categories yet. Try adding one!"
+                    }}
                 />
             </div>
         </>

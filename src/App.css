@@ -4,3 +4,10 @@
 p {
   margin: 0;
 }
+.category-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  object-fit: cover;
+  background-color: transparent;
+}
