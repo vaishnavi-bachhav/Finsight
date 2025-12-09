@@ -11,3 +11,85 @@ p {
   object-fit: cover;
   background-color: transparent;
 }
+
+.transaction-month {
+  border-radius: 12px;
+}
+
+.transaction-month .card-header {
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.transaction-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.transaction-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.placeholder-icon {
+  border: 1px dashed #ccc;
+}
+
+.list-group-item {
+  border-color: #f5f5f5;
+}
+
+/* .list-group-item:hover {
+  background-color: #fafafa;
+} */
+
+.summary-card {
+  border-radius: 12px;
+}
+
+.transaction-chart-card {
+  border-radius: 12px;
+}
+
+.transaction-month {
+  border-radius: 12px;
+}
+
+.transaction-month .card-header {
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.transaction-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.transaction-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.placeholder-icon {
+  border: 1px dashed #ccc;
+}
+
+.list-group-item {
+  border-color: #f5f5f5;
+}
+
+.list-group-item:hover {
+  background-color: #fafafa;
+}
