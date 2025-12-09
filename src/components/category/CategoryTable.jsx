@@ -14,7 +14,7 @@ export default function CategoryTable({ category, onEdit, onDelete }) {
         () =>
             category.map((p, idx) => ({
                 ...p,
-                id: p.id, // DataGrid requires id
+                id: p.id || p._id, // DataGrid requires id
                 srNo: idx + 1,
             })),
         [category]

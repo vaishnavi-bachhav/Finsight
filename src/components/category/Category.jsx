@@ -1,26 +1,34 @@
-import { useState } from 'react';
-import { profiles } from '../../data/data.js';
-import CategoryTable from './CategoryTable.jsx';
-import DeleteConfirmation from '../shared/DeleteConfirmation.jsx';
+import { useState } from "react";
+import useSWR, { mutate } from "swr";
+import CategoryTable from "./CategoryTable.jsx";
+import DeleteConfirmation from "../shared/DeleteConfirmation.jsx";
 import Button from "react-bootstrap/Button";
-import Modal from 'react-bootstrap/Modal';
-import Form from 'react-bootstrap/Form';
+import Modal from "react-bootstrap/Modal";
+import Form from "react-bootstrap/Form";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import CONSTANTS from '../../data/constant.js';
-import FormInput from '../shared/FormInput.jsx';
-import TypeToggle from '../shared/TypeToggle.jsx';
+import CONSTANTS from "../../data/constant.js";
+import FormInput from "../shared/FormInput.jsx";
+import TypeToggle from "../shared/TypeToggle.jsx";
+import { fetchCategories } from "../../api/categoryApi.jsx";
+
+// SWR fetcher
+const swrFetcher = async () => await fetchCategories();
 
 export default function Category() {
     const [show, setShow] = useState(false);
-    const [people, setPeople] = useState(profiles);
-    const [icon, setIcon] = useState('');
+    const [icon, setIcon] = useState("");
     const [editingProfile, setEditingProfile] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null);
 
     // -----------------------------
-    // Yup Validation Schema
+    // Load categories using SWR
+    // -----------------------------
+    const { data: people = [], error, isLoading } = useSWR("categories", swrFetcher);
+
+    // -----------------------------
+    // Validation Schema
     // -----------------------------
     const validationSchema = Yup.object({
         name: Yup.string()
@@ -28,25 +36,27 @@ export default function Category() {
             .required("Name is required")
             .test("unique-name", "Name must be unique", function (value) {
                 if (!value) return false;
-                const match = people.some(
-                    p =>
-                        p.name.toLowerCase() === value.toLowerCase() &&
-                        (!editingProfile || p.id !== editingProfile.id)
-                );
-                return !match;
+
+                return !people.some((p) => {
+                    const isSameRecord =
+                        editingProfile &&
+                        (p.id === editingProfile.id || p._id === editingProfile._id);
+
+                    if (isSameRecord) return false;
+
+                    return p.name.toLowerCase() === value.toLowerCase();
+                });
             }),
         type: Yup.string()
             .oneOf(["income", "expense"], "Type is required")
             .required("Type is required"),
     });
 
-    // -----------------------------
-    // Utility: open/close modals
-    // -----------------------------
+
     const handleClose = () => {
         setShow(false);
+        setIcon("");
         setEditingProfile(null);
-        setIcon('');
     };
 
     const handleEdit = (category) => {
@@ -55,71 +65,68 @@ export default function Category() {
         setShow(true);
     };
 
-    // -----------------------------
-    // Delete Confirmation Logic
-    // -----------------------------
-    const confirmDelete = (person) => {
-        setDeleteTarget(person);
+    const confirmDelete = (item) => {
+        setDeleteTarget(item);
         setShowDeleteModal(true);
     };
 
     const handleConfirmDelete = () => {
-        setPeople(ps => ps.filter(p => p.id !== deleteTarget.id));
+        // Local update for now — can be replaced with API
+        const updated = people.filter((p) => p.id !== deleteTarget.id);
+
+        mutate("categories", updated, false); // update local cache instantly
         setShowDeleteModal(false);
         setDeleteTarget(null);
     };
 
-    // -----------------------------
-    // Handle Icon Upload (to base64)
-    // -----------------------------
+    // Convert icon to base64
     const handleIconChange = (e) => {
-        const file = e.target.files[0];
-        if (!file) {
-            setIcon('');
-            return;
-        }
+        const file = e.target.files?.[0];
+        if (!file) return setIcon("");
 
         const reader = new FileReader();
         reader.onloadend = () => {
-            const base64 = reader.result.split(',')[1];
+            const base64 = reader.result.split(",")[1];
             setIcon(base64);
         };
         reader.readAsDataURL(file);
     };
 
-    // -----------------------------
-    // Form Submit via Formik
-    // -----------------------------
     const handleFormSubmit = (values, { resetForm }) => {
-        const iconToSave =
-            icon ||
-            editingProfile?.icon ||
-            CONSTANTS.DEFAULT_CATEGORY_IMAGE;
+        const iconToSave = icon || editingProfile?.icon || CONSTANTS.DEFAULT_CATEGORY_IMAGE;
+
+        let updatedList;
 
         if (editingProfile) {
-            // Update category
-            setPeople(ps =>
-                ps.map(p =>
-                    p.id === editingProfile.id
-                        ? { ...p, name: values.name, type: values.type, icon: iconToSave }
-                        : p
-                )
+            updatedList = people.map((p) =>
+                p.id === editingProfile.id
+                    ? { ...p, name: values.name, type: values.type, icon: iconToSave }
+                    : p
             );
         } else {
-            // Add new category
             const newCategory = {
-                id: people.length ? Math.max(...people.map(p => p.id)) + 1 : 1,
+                id: people.length ? Math.max(...people.map((p) => p.id)) + 1 : 1,
                 name: values.name,
                 type: values.type,
                 icon: iconToSave,
-                likes: 0
+                likes: 0,
             };
-            setPeople(ps => [...ps, newCategory]);
+
+            updatedList = [...people, newCategory];
         }
+
+        // Update local SWR cache instantly
+        mutate("categories", updatedList, false);
 
         resetForm();
         handleClose();
     };
+
+    // -----------------------------
+    // Loading & Error States
+    // -----------------------------
+    if (isLoading) return <p>Loading categories...</p>;
+    if (error) return <p className="text-danger">Failed to load categories.</p>;
 
     return (
         <>
@@ -128,20 +135,20 @@ export default function Category() {
                     variant="primary"
                     onClick={() => {
                         setEditingProfile(null);
-                        setIcon('');
+                        setIcon("");
                         setShow(true);
                     }}
                 >
-                    + Add Category
+                    + New Category
                 </Button>
             </div>
 
-            {/* Modal */}
+            {/* Category Form Modal */}
             <Modal show={show} onHide={handleClose}>
                 <Formik
                     initialValues={{
-                        name: editingProfile ? editingProfile.name : "",
-                        type: editingProfile ? editingProfile.type || "income" : "income",
+                        name: editingProfile?.name || "",
+                        type: editingProfile?.type || "income",
                     }}
                     validationSchema={validationSchema}
                     onSubmit={handleFormSubmit}
@@ -158,28 +165,23 @@ export default function Category() {
                         <Form noValidate onSubmit={handleSubmit}>
                             <Modal.Header closeButton>
                                 <Modal.Title>
-                                    {editingProfile ? 'Edit Category' : 'Add Category'}
+                                    {editingProfile ? "Edit Category" : "Create New Category"}
                                 </Modal.Title>
                             </Modal.Header>
 
                             <Modal.Body>
-                                <p className='mb-2'>
-                                    {editingProfile
-                                        ? "Update your category details and keep your records clean."
-                                        : "Create a new category to better organize your finances."}
-                                </p>
+                                {editingProfile
+                                    ? "Update your category details and keep your records clean."
+                                    : "Create a new category to better organize your finances."}
 
-                                {/* Name */}
                                 <FormInput
                                     label="Name"
                                     name="name"
-                                    type="text"
                                     placeholder="Enter category name"
                                     formik={{ values, errors, touched, handleChange }}
-                                    required={true}
+                                    required
                                 />
 
-                                {/* Type – pill toggle buttons */}
                                 <TypeToggle
                                     name="type"
                                     formik={{
@@ -188,30 +190,21 @@ export default function Category() {
                                         touched,
                                         setFieldValue,
                                     }}
-                                    required={true}
+                                    required
                                 />
 
-                                {/* Icon (optional) */}
-                                <Form.Group className="mb-3" controlId="formIcon">
-                                    <Form.Label className='fw-bold'>Icon</Form.Label>
-                                    <Form.Control
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleIconChange}
-                                    />
+                                <Form.Group className="mb-3">
+                                    <Form.Label className="fw-bold">Icon</Form.Label>
+                                    <Form.Control type="file" accept="image/*" onChange={handleIconChange} />
+
                                     {icon && (
                                         <div className="mt-2">
                                             <span className="d-block mb-1">Preview:</span>
                                             <img
                                                 src={`data:image/*;base64,${icon}`}
                                                 alt="Icon preview"
-                                                style={{
-                                                    width: '48px',
-                                                    height: '48px',
-                                                    objectFit: 'cover',
-                                                    borderRadius: '4px',
-                                                    border: '1px solid #ddd'
-                                                }}
+                                                className="img-thumbnail"
+                                                style={{ width: 48, height: 48 }}
                                             />
                                         </div>
                                     )}
@@ -224,7 +217,7 @@ export default function Category() {
                                 </Button>
 
                                 <Button variant="primary" type="submit">
-                                    {editingProfile ? "Update" : "Save"}
+                                    {editingProfile ? "Save Changes" : "Create Category"}
                                 </Button>
                             </Modal.Footer>
                         </Form>
@@ -232,7 +225,6 @@ export default function Category() {
                 </Formik>
             </Modal>
 
-            {/* Delete Confirmation */}
             <DeleteConfirmation
                 show={showDeleteModal}
                 onCancel={() => setShowDeleteModal(false)}
@@ -240,11 +232,7 @@ export default function Category() {
                 deleteTarget={deleteTarget}
             />
 
-            <CategoryTable
-                category={people}
-                onDelete={confirmDelete}
-                onEdit={handleEdit}
-            />
+            <CategoryTable category={people} onDelete={confirmDelete} onEdit={handleEdit} />
         </>
     );
 }
