@@ -10,7 +10,7 @@ import * as Yup from "yup";
 import CONSTANTS from "../../data/constant.js";
 import FormInput from "../shared/FormInput.jsx";
 import TypeToggle from "../shared/TypeToggle.jsx";
-import { fetchCategories } from "../../api/categoryApi.jsx";
+import { fetchCategories, addCategory } from "../../api/categoryApi.jsx";
 
 // SWR fetcher
 const swrFetcher = async () => await fetchCategories();
@@ -92,7 +92,7 @@ export default function Category() {
         reader.readAsDataURL(file);
     };
 
-    const handleFormSubmit = (values, { resetForm }) => {
+    const handleFormSubmit = async (values, { resetForm }) => {
         const iconToSave = icon || editingProfile?.icon || CONSTANTS.DEFAULT_CATEGORY_IMAGE;
 
         let updatedList;
@@ -104,19 +104,17 @@ export default function Category() {
                     : p
             );
         } else {
-            const newCategory = {
-                id: people.length ? Math.max(...people.map((p) => p.id)) + 1 : 1,
+            await addCategory({
                 name: values.name,
                 type: values.type,
                 icon: iconToSave,
-                likes: 0,
-            };
+            });
 
-            updatedList = [...people, newCategory];
+            mutate("categories");
         }
 
         // Update local SWR cache instantly
-        mutate("categories", updatedList, false);
+         mutate("categories", updatedList);
 
         resetForm();
         handleClose();
