@@ -4,6 +4,7 @@ import Dashboard from './components/Dashboard';
 import Category from './components/category/Category';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from './components/Layout';
+import Transaction from './components/transaction/Transaction';
 
 function App() {
 
@@ -13,7 +14,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
-            <Route path="transactions" />
+            <Route path="transactions" element={<Transaction/>} />
             <Route path="category" element={<Category />} />
           </Route>
         </Routes>

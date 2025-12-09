@@ -10,7 +10,7 @@ import * as Yup from "yup";
 import CONSTANTS from "../../data/constant.js";
 import FormInput from "../shared/FormInput.jsx";
 import TypeToggle from "../shared/TypeToggle.jsx";
-import { fetchCategories, addCategory, updateCategory, deleteCategory } from "../../api/categoryApi.jsx";
+import { fetchCategories, addCategory, updateCategory, deleteCategory } from "../../api/categoryApi.js";
 
 // SWR fetcher
 const swrFetcher = async () => await fetchCategories();
