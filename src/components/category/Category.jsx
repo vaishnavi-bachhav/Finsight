@@ -10,7 +10,7 @@ import * as Yup from "yup";
 import CONSTANTS from "../../data/constant.js";
 import FormInput from "../shared/FormInput.jsx";
 import TypeToggle from "../shared/TypeToggle.jsx";
-import { fetchCategories, addCategory } from "../../api/categoryApi.jsx";
+import { fetchCategories, addCategory, updateCategory, deleteCategory } from "../../api/categoryApi.jsx";
 
 // SWR fetcher
 const swrFetcher = async () => await fetchCategories();
@@ -70,11 +70,17 @@ export default function Category() {
         setShowDeleteModal(true);
     };
 
-    const handleConfirmDelete = () => {
-        // Local update for now — can be replaced with API
-        const updated = people.filter((p) => p.id !== deleteTarget.id);
+    const handleConfirmDelete = async () => {
+        try {
+            await deleteCategory(deleteTarget._id || deleteTarget.id);
 
-        mutate("categories", updated, false); // update local cache instantly
+            // Revalidate SWR from backend
+            mutate("categories");
+
+        } catch (error) {
+            console.error("Delete failed:", error);
+        }
+
         setShowDeleteModal(false);
         setDeleteTarget(null);
     };
@@ -95,14 +101,16 @@ export default function Category() {
     const handleFormSubmit = async (values, { resetForm }) => {
         const iconToSave = icon || editingProfile?.icon || CONSTANTS.DEFAULT_CATEGORY_IMAGE;
 
-        let updatedList;
+        //let updatedList;
 
         if (editingProfile) {
-            updatedList = people.map((p) =>
-                p.id === editingProfile.id
-                    ? { ...p, name: values.name, type: values.type, icon: iconToSave }
-                    : p
-            );
+            await updateCategory(editingProfile._id || editingProfile.id, {
+                name: values.name,
+                type: values.type,
+                icon: iconToSave,
+            });
+            mutate("categories");
+
         } else {
             await addCategory({
                 name: values.name,
@@ -114,7 +122,7 @@ export default function Category() {
         }
 
         // Update local SWR cache instantly
-         mutate("categories", updatedList);
+        //mutate("categories", updatedList);
 
         resetForm();
         handleClose();
