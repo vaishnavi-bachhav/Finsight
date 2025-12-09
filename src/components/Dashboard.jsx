@@ -11,17 +11,19 @@ export default function Dashboard() {
                     <div className="d-flex justify-content-between align-items-center">
                         <h5>Cashflow</h5>
                     </div>
+
+                    {/* Income vs Expense Bar Chart */}
                     <Bar />
                 </Card.Body>
             </Card>
 
-            {/* Income + Expense */}
+            {/* Income + Expense Donut Charts */}
             <Row>
                 <Col md={6}>
                     <Card className="shadow-sm mb-4">
                         <Card.Body>
                             <h5>Income</h5>
-                            <Donut/>
+                            <Donut />
                         </Card.Body>
                     </Card>
                 </Col>
@@ -30,7 +32,7 @@ export default function Dashboard() {
                     <Card className="shadow-sm mb-4">
                         <Card.Body>
                             <h5>Expense</h5>
-                            <Donut/>
+                            <Donut />
                         </Card.Body>
                     </Card>
                 </Col>
