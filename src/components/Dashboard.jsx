@@ -7,6 +7,7 @@ import Donut from "./Donut";
 import NetWorth from "./NetWorth";
 import useTransactions from "../hooks/useTransactions";
 import { fetchFxRate } from "../api/currencyApi.js";
+import CryptoOverview from "./CryptoOverview.jsx";
 
 const CURRENCY_LIST = ["INR", "EUR", "GBP", "JPY", "AUD", "CAD"];
 
@@ -272,6 +273,19 @@ export default function Dashboard() {
           </Card>
         </Col>
       </Row>
+
+      {/* Crypto Overview (External API: CoinGecko) */}
+      <Card className="mb-4 shadow-sm">
+        <Card.Body>
+          <div className="d-flex justify-content-between align-items-center mb-2">
+            <h5 className="mb-0">Crypto Overview</h5>
+            <small className="text-muted">
+              Live prices & BTC trend (data from CoinGecko)
+            </small>
+          </div>
+          <CryptoOverview />
+        </Card.Body>
+      </Card>
     </>
   );
 }
