@@ -1,12 +1,11 @@
 // src/api/transactionApi.js
-import axios from "axios";
+import api from "./axiosClient.js";
 
-const API_BASE = "http://localhost:3000";
-const TRANSACTION_URL = `${API_BASE}/transaction`;
+const TRANSACTION_URL = `/transaction`;
 
 // GET: grouped transactions
 export const fetchTransactions = async () => {
-  const response = await axios.get(TRANSACTION_URL);
+  const response = await api.get(TRANSACTION_URL);
   // returns [{ month, transactions: [...] }, ...]
   return response.data;
 };
@@ -14,7 +13,7 @@ export const fetchTransactions = async () => {
 // POST
 export const addTransaction = async (transaction) => {
   try {
-    const res = await axios.post(TRANSACTION_URL, transaction);
+    const res = await api.post(TRANSACTION_URL, transaction);
     return res.data;
   } catch (error) {
     console.error("Failed to add transaction:", error);
@@ -28,7 +27,7 @@ export const addTransaction = async (transaction) => {
 // PUT
 export const updateTransaction = async (id, updates) => {
   try {
-    const res = await axios.put(`${TRANSACTION_URL}/${id}`, updates);
+    const res = await api.put(`${TRANSACTION_URL}/${id}`, updates);
     return res.data;
   } catch (error) {
     console.error("Failed to update transaction:", error);
@@ -42,7 +41,7 @@ export const updateTransaction = async (id, updates) => {
 // DELETE
 export const deleteTransaction = async (id) => {
   try {
-    const res = await axios.delete(`${TRANSACTION_URL}/${id}`);
+    const res = await api.delete(`${TRANSACTION_URL}/${id}`);
     return res.data;
   } catch (error) {
     console.error("Failed to delete transaction:", error);
