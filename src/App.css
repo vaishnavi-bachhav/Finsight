@@ -335,3 +335,70 @@ body{
   margin: 1.5rem 0;
 }
 /* -------------------------------------------------------------- */
+
+/* Dashboard wrapper */
+.dashboard-root {
+  color: #e5e7eb;
+}
+
+/* Page header */
+.page-title {
+  color: #f9fafb;
+  font-weight: 600;
+}
+
+.page-subtitle {
+  color: #9ca3af;
+}
+
+/* Dashboard cards (reuse the dark glass style) */
+.dashboard-card {
+  background: radial-gradient(circle at top left, #0f172a, #020617 70%);
+  border: 1px solid #2c3a4a !important;
+  border-radius: 0.9rem;
+  color: #e5e7eb;
+}
+
+/* Section titles inside cards */
+.dashboard-title {
+  color: #f9fafb;
+  font-weight: 600;
+}
+
+/* Summary badges */
+.summary-badge {
+  background: rgba(15, 23, 42, 0.9) !important;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  color: #e5e7eb;
+}
+
+/* Icon pill next to labels */
+.icon-pill {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 20% 20%, #22c55e, #06b6d4);
+  color: #020617;
+  font-size: 0.75rem;
+}
+
+.icon-pill-soft {
+  background: rgba(148, 163, 184, 0.12);
+  color: #e5e7eb;
+}
+
+/* FX select styling */
+.fx-select {
+  background-color: #020617;
+  color: #e5e7eb;
+  border-color: #1f2937;
+}
+
+.fx-select:focus {
+  box-shadow: 0 0 0 1px #22c55e;
+  border-color: #22c55e;
+}
+/*--------------------------
