@@ -58,8 +58,46 @@ export default function CryptoOverview() {
     });
 
     return {
+      theme: {
+        baseTheme: "ag-default-dark",
+        overrides: {
+          common: {
+            title: {
+              color: "#e5e7eb",
+            },
+            subtitle: {
+              color: "#9ca3af",
+            },
+            legend: {
+              item: {
+                label: { color: "#e5e7eb" },
+              },
+            },
+          },
+          cartesian: {
+            axes: {
+              category: {
+                label: { color: "#e5e7eb" },
+                line: { stroke: "#4b5563" },
+                tick: { stroke: "#4b5563" },
+                gridLine: { stroke: "#1f2933" },
+              },
+              number: {
+                label: { color: "#e5e7eb" },
+                line: { stroke: "#4b5563" },
+                tick: { stroke: "#4b5563" },
+                gridLine: { stroke: "#1f2933" },
+              },
+            },
+          },
+        },
+      },
+
+      background: { fill: "#020617" },
+
       title: { text: "Bitcoin (BTC) - Last 30 Days" },
       subtitle: { text: "Powered by CoinGecko" },
+
       data,
       series: [
         {
@@ -72,7 +110,11 @@ export default function CryptoOverview() {
         },
       ],
       axes: [
-        { type: "category", position: "bottom", title: { text: "Date" } },
+        {
+          type: "category",
+          position: "bottom",
+          title: { text: "Date" },
+        },
         {
           type: "number",
           position: "left",
@@ -85,7 +127,13 @@ export default function CryptoOverview() {
           },
         },
       ],
-      legend: { enabled: false }
+      legend: { enabled: false },
+      tooltip: {
+        renderer: ({ datum }) => ({
+          title: datum.dateLabel,
+          content: formatUsd(datum.price),
+        }),
+      },
     };
   }, [chartDataRaw]);
 
@@ -123,12 +171,12 @@ export default function CryptoOverview() {
 
           return (
             <Col md={4} key={id} className="mb-3">
-              <Card className="shadow-sm border-0 h-100">
+              <Card className="shadow-sm border-0 dashboard-card h-100">
                 <Card.Body>
                   <div className="small text-muted mb-1">
                     {DISPLAY_NAMES[id]}
                   </div>
-                  <div className="h5 mb-1">{formatUsd(price)}</div>
+                  <div className="h5 mb-1 text-surface">{formatUsd(price)}</div>
                   <div
                     className={
                       "small fw-semibold " +
@@ -148,7 +196,7 @@ export default function CryptoOverview() {
       </Row>
 
       {chartOptions ? (
-        <Card className="shadow-sm border-0">
+        <Card className="shadow-sm border-0 dashboard-card">
           <Card.Body>
             <AgCharts options={chartOptions} />
           </Card.Body>

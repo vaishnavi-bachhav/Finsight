@@ -122,7 +122,7 @@ export default function Dashboard() {
       <Row className="mb-4">
         {/* Income */}
         <Col md={4}>
-          <Card className="shadow-sm border-0 h-100">
+          <Card className="dashboard-card shadow-sm border-0 h-100">
             <Card.Body>
               <div className="text-muted small">Total Income</div>
               <div className="h4 text-success">{formatCurrency(totalIncome)}</div>
@@ -141,7 +141,7 @@ export default function Dashboard() {
 
         {/* Expense */}
         <Col md={4}>
-          <Card className="shadow-sm border-0 h-100">
+          <Card className="dashboard-card shadow-sm border-0 h-100">
             <Card.Body>
               <div className="text-muted small">Total Expense</div>
               <div className="h4 text-danger">
@@ -162,7 +162,7 @@ export default function Dashboard() {
 
         {/* Net Worth */}
         <Col md={4}>
-          <Card className="shadow-sm border-0 h-100">
+          <Card className="dashboard-card shadow-sm border-0 h-100">
             <Card.Body>
               <div className="text-muted small">Current Net Worth</div>
               <div
@@ -208,7 +208,7 @@ export default function Dashboard() {
       </Row>
 
       {/* Currency Converter UI */}
-      <Card className="mb-4 shadow-sm">
+      <Card className="dashboard-card shadow-sm mb-4">
         <Card.Body className="d-flex justify-content-between align-items-center">
           <div>
             <strong>Currency Conversion</strong>
@@ -238,17 +238,17 @@ export default function Dashboard() {
       </Card>
 
       {/* Cashflow */}
-      <Card className="mb-4 shadow-sm">
+      <Card className="dashboard-card shadow-sm mb-4">
         <Card.Body>
-          <h5>Cashflow</h5>
+          <h5 className="dashboard-title">Cashflow</h5>
           <Bar />
         </Card.Body>
       </Card>
 
       {/* Net Worth */}
-      <Card className="mb-4 shadow-sm">
+      <Card className="dashboard-card mb-4 shadow-sm">
         <Card.Body>
-          <h5>Net Worth</h5>
+          <h5 className="dashboard-title">Net Worth</h5>
           <NetWorth />
         </Card.Body>
       </Card>
@@ -256,18 +256,18 @@ export default function Dashboard() {
       {/* Donuts */}
       <Row>
         <Col md={6}>
-          <Card className="shadow-sm mb-4">
+          <Card className="dashboard-card shadow-sm mb-4">
             <Card.Body>
-              <h5>Income Breakdown</h5>
+              <h5 className="dashboard-title">Income Breakdown</h5>
               <Donut type="income" />
             </Card.Body>
           </Card>
         </Col>
 
         <Col md={6}>
-          <Card className="shadow-sm mb-4">
+          <Card className="dashboard-card shadow-sm mb-4">
             <Card.Body>
-              <h5>Expense Breakdown</h5>
+              <h5 className="dashboard-title">Expense Breakdown</h5>
               <Donut type="expense" />
             </Card.Body>
           </Card>
@@ -275,10 +275,10 @@ export default function Dashboard() {
       </Row>
 
       {/* Crypto Overview (External API: CoinGecko) */}
-      <Card className="mb-4 shadow-sm">
+      <Card className="dashboard-card mb-4 shadow-sm">
         <Card.Body>
           <div className="d-flex justify-content-between align-items-center mb-2">
-            <h5 className="mb-0">Crypto Overview</h5>
+            <h5 className="dashboard-title mb-0">Crypto Overview</h5>
             <small className="text-muted">
               Live prices & BTC trend (data from CoinGecko)
             </small>

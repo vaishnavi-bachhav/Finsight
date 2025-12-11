@@ -8,48 +8,57 @@ import {
   SignInButton,
   useUser,
 } from "@clerk/clerk-react";
-import { LayoutDashboard, ArrowLeftRight, Shapes } from 'lucide-react';
+import { LayoutDashboard, ArrowLeftRight, Shapes, WalletCards } from "lucide-react";
 
 export default function Layout() {
   const { user } = useUser();
 
   return (
-    <Container fluid>
+    <Container fluid className="layout-root">
       <Row>
         {/* ---------------- Sidebar ---------------- */}
         <Col
           md={2}
-          className="bg-light border-end min-vh-100 d-flex flex-column"
+          className="sidebar-dark d-flex flex-column p-0 min-vh-100"
         >
           {/* App title + user profile */}
-          <div className="pt-3 pb-3 border-bottom">
-            <h6 className="fw-bold mb-3">Fin Sight</h6>
+          <div className="sidebar-header px-3 py-3 border-bottom-dark">
+            <div
+                        className="d-flex align-items-center gap-2 brand"
+                        style={{ cursor: "pointer" }}
+                       // onClick={() => navigate("/")}
+                    >
+                        <div className="brand-logo">
+                            <WalletCards size={18} />
+                        </div>
+                        <div>
+                            <span className="fw-bold fs-5 brand-name">FinSight</span>
+                            <div className="brand-sub">Control every dollar, every month</div>
+                        </div>
+                    </div>
+                    <hr />
 
-            {/* Signed-in user info */}
             <SignedIn>
-              <div className="d-flex align-items-center gap-2">
-                {/* Avatar with dropdown (includes Sign out) */}
+              <div className="d-flex align-items-center gap-2 sidebar-user">
                 <UserButton
                   appearance={{
                     elements: {
-                      userButtonOuterIdentifier: "d-none", // hide email under avatar
+                      userButtonOuterIdentifier: "d-none", // hide extra text
                     },
                   }}
                 />
 
                 <div className="small">
-                  <div className="fw-semibold">
+                  <div className="fw-semibold text-surface">
                     {user?.firstName || "Welcome"}
                   </div>
-                 
                 </div>
               </div>
             </SignedIn>
 
-            {/* Signed-out: show a sign-in button instead */}
             <SignedOut>
               <SignInButton mode="modal" redirectUrl="/dashboard">
-                <button className="btn btn-primary btn-sm w-100 mt-2">
+                <button className="btn-gradient-main btn-sm w-100 mt-2">
                   Sign in to continue
                 </button>
               </SignInButton>
@@ -57,39 +66,38 @@ export default function Layout() {
           </div>
 
           {/* Navigation links */}
-          <div className="pt-3 flex-grow-1">
-            <ListGroup variant="flush">
+          <div className="flex-grow-1 mt-3">
+            <ListGroup variant="flush" className="sidebar-list">
               <ListGroup.Item
-                action
                 as={NavLink}
                 to="/dashboard"
                 end
-                className="border-0"
+                className="sidebar-item"
               >
-                <LayoutDashboard/> Dashboard
+                <LayoutDashboard size={18} className="me-2" /> Dashboard
               </ListGroup.Item>
+
               <ListGroup.Item
-                action
                 as={NavLink}
                 to="/transactions"
-                className="border-0"
+                className="sidebar-item"
               >
-                <ArrowLeftRight/> Transactions
+                <ArrowLeftRight size={18} className="me-2" /> Transactions
               </ListGroup.Item>
+
               <ListGroup.Item
-                action
                 as={NavLink}
                 to="/category"
-                className="border-0"
+                className="sidebar-item"
               >
-                <Shapes/> Category
+                <Shapes size={18} className="me-2" /> Category
               </ListGroup.Item>
             </ListGroup>
           </div>
         </Col>
 
         {/* ---------------- Main Content ---------------- */}
-        <Col md={10} className="p-4">
+        <Col md={10} className="content-area p-4">
           <Outlet />
         </Col>
       </Row>
