@@ -4,6 +4,8 @@ import useSWR, { mutate } from "swr";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 import Pagination from "react-bootstrap/Pagination";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -56,6 +58,11 @@ export default function Transaction() {
   const [editing, setEditing] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  // filters
+  const [typeFilter, setTypeFilter] = useState("all");     // all | income | expense
+  const [categoryFilter, setCategoryFilter] = useState("all"); // category _id | "all"
+  const [monthFilter, setMonthFilter] = useState("all");   // month label | "all"
   const [page, setPage] = useState(1);
 
   // Transactions (grouped by month)
@@ -119,19 +126,66 @@ export default function Transaction() {
     }
   };
 
-  // -------- Pagination logic -------------------------------------
+  // ---------- Filtering & pagination -----------------------------
+
+  // reset to page 1 whenever filters change
+  useEffect(() => {
+    setPage(1);
+  }, [typeFilter, categoryFilter, monthFilter]);
+
+  // apply filters to month groups and to the transactions inside
+  const filteredGroups = grouped.reduce((acc, group) => {
+    // month filter
+    if (monthFilter !== "all" && group.month !== monthFilter) {
+      return acc;
+    }
+
+    // filter transactions inside the month
+    const visibleTransactions = group.transactions.filter((tx) => {
+      if (typeFilter !== "all" && tx.type !== typeFilter) return false;
+      if (
+        categoryFilter !== "all" &&
+        tx.category &&
+        tx.category._id !== categoryFilter
+      ) {
+        return false;
+      }
+      if (categoryFilter !== "all" && !tx.category && categoryFilter !== "all") {
+        return false;
+      }
+      return true;
+    });
+
+    // if type/category filters are active and this month has no visible tx,
+    // skip the whole month card
+    const filtersActive =
+      typeFilter !== "all" || categoryFilter !== "all" || monthFilter !== "all";
+
+    if (filtersActive && visibleTransactions.length === 0) {
+      return acc;
+    }
+
+    acc.push({
+      ...group,
+      visibleTransactions: visibleTransactions.length
+        ? visibleTransactions
+        : group.transactions,
+    });
+    return acc;
+  }, []);
 
   const totalPages =
-    grouped.length > 0 ? Math.ceil(grouped.length / PAGE_SIZE) : 1;
+    filteredGroups.length > 0
+      ? Math.ceil(filteredGroups.length / PAGE_SIZE)
+      : 1;
 
-  // keep page in range when data changes (e.g. after delete)
   useEffect(() => {
     if (page > totalPages) {
       setPage(totalPages);
     }
-  }, [grouped.length, page, totalPages]);
+  }, [filteredGroups.length, page, totalPages]);
 
-  const pagedMonths = grouped.slice(
+  const pagedMonths = filteredGroups.slice(
     (page - 1) * PAGE_SIZE,
     page * PAGE_SIZE
   );
@@ -166,7 +220,81 @@ export default function Transaction() {
         </Button>
       </div>
 
-      {/* Modal Form (unchanged logic) */}
+      {/* Filter bar */}
+      <div className="transaction-filters mb-4 p-3 rounded-4">
+        <Row className="g-3 align-items-end">
+          <Col md={4}>
+            <Form.Label className="fw-semibold text-muted small">
+              Type
+            </Form.Label>
+            <Form.Select
+              size="sm"
+              className="dark-input"
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+            >
+              <option value="all">All types</option>
+              <option value="income">Income only</option>
+              <option value="expense">Expense only</option>
+            </Form.Select>
+          </Col>
+
+          <Col md={4}>
+            <Form.Label className="fw-semibold text-muted small">
+              Category
+            </Form.Label>
+            <Form.Select
+              size="sm"
+              className="dark-input"
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+            >
+              <option value="all">All categories</option>
+              {categories.map((cat) => (
+                <option key={cat._id} value={cat._id}>
+                  {cat.name}
+                </option>
+              ))}
+            </Form.Select>
+          </Col>
+
+          <Col md={3}>
+            <Form.Label className="fw-semibold text-muted small">
+              Month
+            </Form.Label>
+            <Form.Select
+              size="sm"
+              className="dark-input"
+              value={monthFilter}
+              onChange={(e) => setMonthFilter(e.target.value)}
+            >
+              <option value="all">All months</option>
+              {grouped.map((g) => (
+                <option key={g.month} value={g.month}>
+                  {g.month}
+                </option>
+              ))}
+            </Form.Select>
+          </Col>
+
+          <Col md={1} className="text-md-end">
+            <Button
+              size="sm"
+              variant="outline-secondary"
+              className="btn-soft-dark w-100"
+              onClick={() => {
+                setTypeFilter("all");
+                setCategoryFilter("all");
+                setMonthFilter("all");
+              }}
+            >
+              Clear
+            </Button>
+          </Col>
+        </Row>
+      </div>
+
+      {/* Modal Form */}
       <Modal
         show={show}
         onHide={handleClose}
@@ -334,9 +462,9 @@ export default function Transaction() {
         deleteTarget={deleteTarget}
       />
 
-      {/* Month cards WITH pagination */}
+      {/* Month cards (filtered + paginated) */}
       {pagedMonths.map(
-        ({ month, transactions, totalIncome, totalExpense, net }) => (
+        ({ month, transactions, totalIncome, totalExpense, net, visibleTransactions }) => (
           <div key={month} className="transaction-card mb-4 shadow-sm">
             {/* Card header */}
             <div className="transaction-header d-flex justify-content-between align-items-center px-4 pt-3 pb-2">
@@ -374,12 +502,12 @@ export default function Transaction() {
 
             {/* Card body: transactions list */}
             <div className="list-group list-group-flush transaction-list">
-              {transactions.map((tx, index) => (
+              {(visibleTransactions || transactions).map((tx, index, arr) => (
                 <div
                   key={tx._id}
                   className={
                     "list-group-item transaction-list-item d-flex justify-content-between align-items-center px-4 " +
-                    (index === transactions.length - 1 ? "pb-3" : "")
+                    (index === arr.length - 1 ? "pb-3" : "")
                   }
                 >
                   {/* LEFT: icon + text */}
@@ -453,9 +581,9 @@ export default function Transaction() {
                 </div>
               ))}
 
-              {transactions.length === 0 && (
+              {(visibleTransactions || transactions).length === 0 && (
                 <div className="list-group-item transaction-list-item text-muted small px-4 pb-3">
-                  No transactions recorded for this month yet.
+                  No transactions matching the selected filters for this month.
                 </div>
               )}
             </div>
@@ -463,18 +591,17 @@ export default function Transaction() {
         )
       )}
 
-      {grouped.length === 0 && (
+      {filteredGroups.length === 0 && (
         <div className="text-center text-muted mt-5">
-          <p className="mb-1">No transactions yet.</p>
+          <p className="mb-1">No transactions match your filters.</p>
           <p className="small">
-            Click <strong>“New Transaction”</strong> to start tracking your
-            money.
+            Try adjusting or clearing the filters above.
           </p>
         </div>
       )}
 
       {/* Pagination controls */}
-      {grouped.length > 0 && totalPages > 1 && (
+      {filteredGroups.length > 0 && totalPages > 1 && (
         <Pagination className="justify-content-center mt-3 pagination-dark">
           <Pagination.Prev
             disabled={page === 1}
