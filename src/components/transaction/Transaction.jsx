@@ -358,6 +358,8 @@ export default function Transaction() {
         centered
         className="dark-modal"
         backdrop="static"
+  dialogClassName="dark-modal-dialog"        // 👈 custom dialog for animation
+  backdropClassName="dark-modal-backdrop"  
       >
         <Formik
           initialValues={{

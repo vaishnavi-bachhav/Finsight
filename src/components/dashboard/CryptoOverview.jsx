@@ -171,7 +171,7 @@ export default function CryptoOverview() {
 
           return (
             <Col md={4} key={id} className="mb-3">
-              <Card className="shadow-sm border-0 dashboard-card h-100">
+              <Card className="shadow-sm border-0 dashboard-card h-100 fade-in-bck">
                 <Card.Body>
                   <div className="small text-muted mb-1">
                     {DISPLAY_NAMES[id]}
@@ -196,7 +196,7 @@ export default function CryptoOverview() {
       </Row>
 
       {chartOptions ? (
-        <Card className="shadow-sm border-0 dashboard-card">
+        <Card className="shadow-sm border-0 dashboard-card fade-in-bck">
           <Card.Body>
             <AgCharts options={chartOptions} />
           </Card.Body>

@@ -38,7 +38,7 @@ function CurrencySelectorCard({
   fxError,
 }) {
   return (
-    <Card className="dashboard-card shadow-sm">
+    <Card className="dashboard-card shadow-sm fade-in-bck">
       <Card.Body className="py-2 px-3 d-flex align-items-center gap-3">
         <div className="d-flex align-items-center gap-2">
           <div className="icon-pill">
@@ -81,7 +81,7 @@ function CashflowSnapshotCard({ snapshot }) {
   if (!snapshot?.label) return null;
 
   return (
-    <Card className="dashboard-card shadow-sm mb-4">
+    <Card className="dashboard-card shadow-sm mb-4 fade-in-bck">
       <Card.Body>
         <div className="d-flex justify-content-between mb-3">
           <div>
@@ -187,7 +187,7 @@ function SummaryCard({
   children,
 }) {
   return (
-    <Card className="dashboard-card shadow-sm border-0 h-100">
+    <Card className="dashboard-card shadow-sm border-0 h-100 fade-in-bck">
       <Card.Body>
         <div className="d-flex justify-content-between align-items-center mb-1">
           <span className="text-muted small">{label}</span>
@@ -466,7 +466,7 @@ export default function Dashboard() {
       {/* Cashflow + Net Worth */}
       <Row className="mb-4 g-3">
         <Col lg={7}>
-          <Card className="dashboard-card shadow-sm h-100">
+          <Card className="dashboard-card shadow-sm h-100 fade-in-bck">
             <Card.Body>
               <div className="d-flex justify-content-between align-items-center mb-2">
                 <h5 className="dashboard-title mb-0">Cashflow</h5>
@@ -480,7 +480,7 @@ export default function Dashboard() {
         </Col>
 
         <Col lg={5}>
-          <Card className="dashboard-card shadow-sm h-100">
+          <Card className="dashboard-card shadow-sm h-100 fade-in-bck">
             <Card.Body>
               <div className="d-flex justify-content-between align-items-center mb-2">
                 <h5 className="dashboard-title mb-0">Net Worth Trend</h5>
@@ -495,7 +495,7 @@ export default function Dashboard() {
       {/* Donuts */}
       <Row className="mb-4 g-3">
         <Col md={6}>
-          <Card className="dashboard-card shadow-sm h-100">
+          <Card className="dashboard-card shadow-sm h-100 fade-in-bck">
             <Card.Body>
               <h5 className="dashboard-title mb-2">Income Breakdown</h5>
               <p className="small text-muted mb-3">
@@ -507,7 +507,7 @@ export default function Dashboard() {
         </Col>
 
         <Col md={6}>
-          <Card className="dashboard-card shadow-sm h-100">
+          <Card className="dashboard-card shadow-sm h-100 fade-in-bck">
             <Card.Body>
               <h5 className="dashboard-title mb-2">Expense Breakdown</h5>
               <p className="small text-muted mb-3">
