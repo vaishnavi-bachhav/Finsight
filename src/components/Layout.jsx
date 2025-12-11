@@ -8,6 +8,7 @@ import {
   SignInButton,
   useUser,
 } from "@clerk/clerk-react";
+import { LayoutDashboard, ArrowLeftRight, Shapes } from 'lucide-react';
 
 export default function Layout() {
   const { user } = useUser();
@@ -29,7 +30,6 @@ export default function Layout() {
               <div className="d-flex align-items-center gap-2">
                 {/* Avatar with dropdown (includes Sign out) */}
                 <UserButton
-                  afterSignOutUrl="/"
                   appearance={{
                     elements: {
                       userButtonOuterIdentifier: "d-none", // hide email under avatar
@@ -66,7 +66,7 @@ export default function Layout() {
                 end
                 className="border-0"
               >
-                🏠 Dashboard
+                <LayoutDashboard/> Dashboard
               </ListGroup.Item>
               <ListGroup.Item
                 action
@@ -74,7 +74,7 @@ export default function Layout() {
                 to="/transactions"
                 className="border-0"
               >
-                📄 Transactions
+                <ArrowLeftRight/> Transactions
               </ListGroup.Item>
               <ListGroup.Item
                 action
@@ -82,7 +82,7 @@ export default function Layout() {
                 to="/category"
                 className="border-0"
               >
-                📁 Category
+                <Shapes/> Category
               </ListGroup.Item>
             </ListGroup>
           </div>

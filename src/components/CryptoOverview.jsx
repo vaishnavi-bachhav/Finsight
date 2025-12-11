@@ -1,5 +1,5 @@
 // src/components/CryptoOverview.jsx
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { Card, Row, Col } from "react-bootstrap";
 import { AgCharts } from "ag-charts-react";
 import useSWR from "swr";
@@ -85,13 +85,7 @@ export default function CryptoOverview() {
           },
         },
       ],
-      legend: { enabled: false },
-      tooltip: {
-        renderer: ({ datum }) => ({
-          title: datum.dateLabel,
-          content: formatUsd(datum.price),
-        }),
-      },
+      legend: { enabled: false }
     };
   }, [chartDataRaw]);
 

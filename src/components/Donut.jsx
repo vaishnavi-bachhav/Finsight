@@ -9,7 +9,7 @@ export default function Donut({ type }) {
   // -----------------------
   // Build category totals
   // -----------------------
-  const { chartData, totalAmount } = useMemo(() => {
+  const { chartData } = useMemo(() => {
     const categoryTotals = {};
     let total = 0;
 
@@ -82,41 +82,7 @@ export default function Donut({ type }) {
       },
     ],
 
-    legend: { position: "right" },
-
-    // SHOW TOTAL IN CENTER OF DONUT
-    overlays: [
-      {
-        type: "text",
-        text: `$${totalAmount.toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-        })}`,
-        fontSize: 20,
-        fontWeight: "600",
-        color: type === "income" ? "#16a34a" : "#dc2626",
-        x: 0.5,
-        y: 0.5,
-        zIndex: 10,
-      },
-      {
-        type: "text",
-        text: type === "income" ? "Total Income" : "Total Expense",
-        fontSize: 12,
-        color: "#6b7280",
-        x: 0.5,
-        y: 0.58,
-        zIndex: 10,
-      },
-    ],
-
-    tooltip: {
-      renderer: ({ datum }) => ({
-        title: datum.asset,
-        content: `$${datum.amount.toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-        })} (${datum.percentage.toFixed(1)}%)`,
-      }),
-    },
+    legend: { position: "right" }
   };
 
   return <AgCharts options={options} />;

@@ -17,7 +17,6 @@ export default function Bar() {
   // -----------------------------
   const {
     chartData,
-    monthCategorySummary,
     topIncomeCats,
     topExpenseCats
   } = useMemo(() => {
@@ -120,34 +119,8 @@ export default function Bar() {
           },
         },
       ],
-
-      tooltip: {
-        renderer: ({ datum, yKey, yName }) => {
-          const month = datum.month;
-          const total = datum[yKey] || 0;
-          const typeKey = yKey === "income" ? "income" : "expense";
-          const cats = monthCategorySummary[month]?.[typeKey] || {};
-
-          const body = Object.entries(cats)
-            .map(
-              ([name, amt]) =>
-                `${name}: $${amt.toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                })}`
-            )
-            .join("\n");
-
-          return {
-            title: month,
-            content:
-              body.length > 0
-                ? `${body}\n──────\nTotal ${yName}: $${total.toLocaleString()}`
-                : `Total ${yName}: $${total.toLocaleString()}`,
-          };
-        },
-      },
     };
-  }, [noData, chartData, monthCategorySummary]);
+  }, [noData, chartData]);
 
   // -----------------------------
   // UI Rendering
