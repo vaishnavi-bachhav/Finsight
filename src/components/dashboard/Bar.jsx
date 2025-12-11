@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { AgCharts } from "ag-charts-react";
-import useTransactions from "../hooks/useTransactions.js";
+import useTransactions from "../../hooks/useTransactions.js";
 
 export default function Bar() {
   const { grouped, isLoading, error } = useTransactions();

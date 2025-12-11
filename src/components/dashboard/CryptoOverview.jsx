@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { Card, Row, Col } from "react-bootstrap";
 import { AgCharts } from "ag-charts-react";
 import useSWR from "swr";
-import { fetchCryptoPrices, fetchCryptoMarketChart } from "../api/cryptoApi.js";
+import { fetchCryptoPrices, fetchCryptoMarketChart } from "../../api/cryptoApi.js";
 
 const CRYPTO_IDS = ["bitcoin", "ethereum", "dogecoin"];
 const DISPLAY_NAMES = {
@@ -105,7 +105,7 @@ export default function CryptoOverview() {
           xKey: "dateLabel",
           yKey: "price",
           yName: "Price (USD)",
-          stroke: "#f97316",
+          stroke: "#22c55e",
           marker: { size: 4 },
         },
       ],

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { AgCharts } from "ag-charts-react";
-import useTransactions from "../hooks/useTransactions";
+import useTransactions from "../../hooks/useTransactions";
 
 export default function NetWorth() {
   const { grouped, isLoading, error } = useTransactions();

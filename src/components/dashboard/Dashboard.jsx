@@ -3,19 +3,20 @@ import { Card, Row, Col, Badge } from "react-bootstrap";
 import { useMemo, useState } from "react";
 import useSWR from "swr";
 
-import Bar from "./Bar";
-import Donut from "./Donut";
-import NetWorth from "./NetWorth";
-import useTransactions from "../hooks/useTransactions";
-import { fetchFxRate } from "../api/currencyApi.js";
+import Bar from "./Bar.jsx";
+import Donut from "./Donut.jsx";
+import NetWorth from "./NetWorth.jsx";
+import useTransactions from "../../hooks/useTransactions.js";
+import { fetchFxRate } from "../../api/currencyApi.js";
 import CryptoOverview from "./CryptoOverview.jsx";
 
-// Icons (you already use lucide-react elsewhere)
+// Icons
 import {
   ArrowUpCircle,
   ArrowDownCircle,
   Wallet,
   Globe2,
+  PieChart as PieChartIcon,
 } from "lucide-react";
 
 const CURRENCY_LIST = ["INR", "EUR", "GBP", "JPY", "AUD", "CAD"];
@@ -31,7 +32,7 @@ export default function Dashboard() {
 
   const [targetCurrency, setTargetCurrency] = useState("INR");
 
-  // Fetch currency rate once per currency
+  // FX rate for currency conversion
   const { data: fxData, error: fxError } = useSWR(
     ["fx-rate", targetCurrency],
     ([, currency]) => fetchFxRate({ base: "USD", symbols: currency }),
@@ -42,7 +43,7 @@ export default function Dashboard() {
   const convert = (usd) => (exchangeRate ? usd * exchangeRate : 0);
 
   // -----------------------------
-  // Summary computation
+  // Global summary computation
   // -----------------------------
   const summary = useMemo(() => {
     if (!grouped?.length) {
@@ -124,6 +125,54 @@ export default function Dashboard() {
   } = summary;
 
   // -----------------------------
+  // “This month’s snapshot” data
+  // (for the new card like your landing preview)
+  // -----------------------------
+  const snapshot = useMemo(() => {
+    if (!grouped?.length) {
+      return {
+        label: null,
+        income: 0,
+        expense: 0,
+        net: 0,
+        topExpenses: [],
+      };
+    }
+
+    // backend already returns months sorted latest first
+    const latest = grouped[0];
+
+    const income = latest.totalIncome || 0;
+    const expense = latest.totalExpense || 0;
+    const net = income - expense;
+
+    const expenseTotals = {};
+    (latest.transactions || []).forEach((tx) => {
+      if (tx.type !== "expense") return;
+      const cat = tx.category?.name || "Uncategorized";
+      const amt = Number(tx.amount || 0);
+      expenseTotals[cat] = (expenseTotals[cat] || 0) + amt;
+    });
+
+    const topExpenses = Object.entries(expenseTotals)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([name, amount]) => ({
+        name,
+        amount,
+        pct: expense ? (amount / expense) * 100 : 0,
+      }));
+
+    return {
+      label: latest.month,
+      income,
+      expense,
+      net,
+      topExpenses,
+    };
+  }, [grouped]);
+
+  // -----------------------------
   // Loading / error
   // -----------------------------
   if (isLoading) return <p>Loading dashboard...</p>;
@@ -143,7 +192,7 @@ export default function Dashboard() {
           </p>
         </Col>
         <Col md="auto" className="mt-3 mt-md-0">
-          {/* Currency selection inline for a more “control panel” feel */}
+          {/* Currency selection / FX block */}
           <Card className="dashboard-card shadow-sm">
             <Card.Body className="py-2 px-3 d-flex align-items-center gap-3">
               <div className="d-flex align-items-center gap-2">
@@ -180,6 +229,99 @@ export default function Dashboard() {
           </Card>
         </Col>
       </Row>
+
+      {/* -------- New Cashflow Snapshot card (like your landing page) -------- */}
+      {snapshot.label && (
+        <Card className="dashboard-card shadow-sm mb-4">
+          <Card.Body>
+            <div className="d-flex justify-content-between mb-3">
+              <div>
+                <div className="small text-muted mb-1">
+                  This month&apos;s overview · {snapshot.label}
+                </div>
+                <div className="fw-bold text-surface">Cashflow Snapshot</div>
+              </div>
+              <div className="text-end small">
+                <div
+                  className={
+                    snapshot.net >= 0
+                      ? "text-success fw-semibold"
+                      : "text-danger fw-semibold"
+                  }
+                >
+                  {snapshot.net >= 0 ? "+" : "-"}
+                  {formatCurrency(Math.abs(snapshot.net))}
+                </div>
+                <div className="text-muted">Net this month</div>
+              </div>
+            </div>
+
+            <Row className="gy-3 mb-3">
+              <Col xs={6}>
+                <Card className="border-0 stat-card">
+                  <Card.Body className="py-2">
+                    <div className="small text-muted">Income</div>
+                    <div className="fw-semibold text-success">
+                      {formatCurrency(snapshot.income)}
+                    </div>
+                  </Card.Body>
+                </Card>
+              </Col>
+              <Col xs={6}>
+                <Card className="border-0 stat-card stat-card-expense">
+                  <Card.Body className="py-2">
+                    <div className="small text-muted">Expense</div>
+                    <div className="fw-semibold text-danger">
+                      {formatCurrency(snapshot.expense)}
+                    </div>
+                  </Card.Body>
+                </Card>
+              </Col>
+            </Row>
+
+            <Row className="gy-3">
+              <Col md={6}>
+                <div className="d-flex flex-column gap-2 w-100">
+                  {snapshot.topExpenses.length > 0 ? (
+                    snapshot.topExpenses.map((cat) => (
+                      <div key={cat.name}>
+                        <div className="d-flex justify-content-between small">
+                          <span>{cat.name}</span>
+                          <span className="text-danger">
+                            {formatCurrency(cat.amount)}
+                          </span>
+                        </div>
+                        <div className="progress glass-progress">
+                          <div
+                            className="progress-bar bg-danger"
+                            style={{
+                              width: `${Math.min(100, cat.pct).toFixed(1)}%`,
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="small text-muted">
+                      No expense categories for this month yet.
+                    </div>
+                  )}
+                </div>
+              </Col>
+
+              <Col
+                md={6}
+                className="d-flex flex-column align-items-center justify-content-center"
+              >
+                <PieChartIcon size={48} className="mb-2 text-primary" />
+                <div className="small text-muted text-center">
+                  See where every dollar goes with clear visual breakdowns.
+                </div>
+              </Col>
+            </Row>
+          </Card.Body>
+        </Card>
+      )}
 
       {/* Summary Cards */}
       <Row className="mb-4 g-3">
