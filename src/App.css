@@ -828,3 +828,141 @@ body{
   font-weight: 600;
 }
 /* -------------------------------------------------- */
+/* Category table bits */
+
+.category-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  object-fit: cover;
+  /* background-color: #000814 !important;
+  color:#cbd5e1 !important; */
+  border: 1px solid rgba(148, 163, 184, 0.5);
+}
+
+.category-name {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Category table styling */
+
+.category-section .card.dashboard-card {
+  background: radial-gradient(circle at top left, #0f172a, #020617 70%);
+  border: 1px solid #1e293b;
+  border-radius: 0.9rem;
+}
+
+.category-table thead th {
+  border-bottom: 1px solid #1f2937;
+}
+
+.category-table tbody tr.category-row:hover {
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.category-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+}
+
+/* Filter pills reuse your button theme */
+
+.btn-soft-dark {
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 999px;
+  border: 1px solid #1f2937;
+  color: #e5e7eb;
+  padding-inline: 0.9rem;
+}
+
+.btn-soft-dark:hover {
+  background: rgba(30, 64, 175, 0.35);
+  border-color: #4b5563;
+}
+
+.btn-soft-danger {
+  background: rgba(127, 29, 29, 0.1);
+  border-radius: 999px;
+  border: 1px solid rgba(248, 113, 113, 0.5);
+  color: #fecaca;
+}
+
+.btn-soft-danger:hover {
+  background: rgba(248, 113, 113, 0.18);
+  border-color: #f87171;
+}
+
+/* red asterisk for required labels */
+.required-label::after {
+  content: " *";
+  color: #f97373;
+  margin-left: 0.15rem;
+}
+
+/* Dark themed form control (used everywhere in modals) */
+.dark-input {
+  background-color: rgba(15, 23, 42, 0.98);
+  border-radius: 0.75rem;
+  border: 1px solid #1f2937;
+  color: #e5e7eb;
+}
+
+.dark-input::placeholder {
+  color: #6b7280;
+}
+
+.dark-input:focus {
+  background-color: rgba(15, 23, 42, 1);
+  border-color: #22c55e;
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.3);
+  color: #f9fafb;
+}
+
+/* Generic dark input styling */
+.dark-input {
+  background-color: rgba(15, 23, 42, 0.98) !important;
+  border: 1px solid #1f2937 !important;
+  color: #e5e7eb !important;
+  border-radius: 0.75rem !important;
+  padding: 0.6rem 0.85rem !important;
+}
+
+.dark-input:focus {
+  background-color: rgba(15, 23, 42, 1) !important;
+  border-color: #22c55e !important;
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.35) !important;
+  color: #f9fafb !important;
+}
+
+.dark-input::placeholder {
+  color: #6b7280 !important;
+}
+
+/* -------- FILE INPUT STYLING -------- */
+/* Base dark input */
+.dark-input[type="file"] {
+  cursor: pointer;
+  background: #0f172a;
+  color: #e5e7eb;
+}
+
+/* Normal state (button inside file input) */
+.dark-input[type="file"]::file-selector-button,
+.dark-input[type="file"]::-webkit-file-upload-button {
+  background: #111827;
+  color: #e5e7eb;
+  border: none;
+  cursor: pointer;
+}
+
+/* Hover state (this is what you want to customize) */
+.dark-input[type="file"]::file-selector-button:hover,
+.dark-input[type="file"]::-webkit-file-upload-button:hover {
+  background: #22c55e !important;  /* <— change this to ANY color */
+  color: #020617 !important;
+}
+/* -------------------- CLERK USER BUTTON DARK THEME -------------------- */

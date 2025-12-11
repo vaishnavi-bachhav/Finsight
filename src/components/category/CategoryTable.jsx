@@ -1,162 +1,156 @@
+// src/components/category/CategoryTable.jsx
 import { useMemo, useState } from "react";
-import { DataGrid } from "@mui/x-data-grid";
 import Button from "react-bootstrap/Button";
 import TypeBadge from "../shared/TypeBadge.jsx";
 import CONSTANTS from "../../data/constant.js";
 
 export default function CategoryTable({ category, onEdit, onDelete }) {
-    const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all"); // all | income | expense
 
-    // -----------------------------
-    // Prepare rows with Sr No + id
-    // -----------------------------
-    const rows = useMemo(
-        () =>
-            category.map((p, idx) => ({
-                ...p,
-                id: p.id || p._id, // DataGrid requires id
-                srNo: idx + 1,
-            })),
-        [category]
-    );
+  // Normalize raw list into rows with stable id
+  const rows = useMemo(
+    () =>
+      (category || []).map((p, idx) => ({
+        ...p,
+        id: p.id || p._id || idx, // fallback just in case
+      })),
+    [category]
+  );
 
-    // -----------------------------
-    // Search Filter (by name)
-    // -----------------------------
-    const normalizedSearch = search.trim().toLowerCase();
+  // Filter by name + type
+  const filteredRows = useMemo(
+    () =>
+      rows.filter((row) => {
+        const matchesType =
+          typeFilter === "all" ? true : row.type === typeFilter;
 
-    const filteredRows = useMemo(
-        () =>
-            !normalizedSearch
-                ? rows
-                : rows.filter((row) =>
-                    row.name?.toLowerCase().includes(normalizedSearch)
-                ),
-        [rows, normalizedSearch]
-    );
+        return  matchesType;
+      }),
+    [rows, typeFilter]
+  );
 
-    // -----------------------------
-    // Split by type AFTER filtering
-    // -----------------------------
-    const incomeRows = filteredRows.filter((r) => r.type === "income");
-    const expenseRows = filteredRows.filter((r) => r.type === "expense");
+  return (
+    <div className="category-section">
+      {/* Filters row */}
+      <div className="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
+        {/* <div>
+          <h5 className="mb-1 text-surface">All Categories</h5>
+          <small className="text-muted">
+            Filter by type or search by name.
+          </small>
+        </div> */}
 
-    // -----------------------------
-    // DataGrid Columns
-    // -----------------------------
-    const columns = [
-        // Combined Icon + Name column
-        {
-            field: "category",
-            headerName: "Category",
-            width: 260,
-            sortable: false,
-            filterable: false,
-            renderCell: (params) => {
-                const row = params.row;
-                const icon = row.icon || CONSTANTS.DEFAULT_CATEGORY_IMAGE;
+        <div className="d-flex flex-wrap align-items-center gap-2 ms-auto">
+          {/* Type filter pills */}
+          <div className="btn-group" role="group" aria-label="Type filter">
+            <button
+              type="button"
+              className={
+                "btn btn-sm " +
+                (typeFilter === "all" ? "btn-gradient-main" : "btn-soft-dark")
+              }
+              onClick={() => setTypeFilter("all")}
+            >
+              All
+            </button>
+            <button
+              type="button"
+              className={
+                "btn btn-sm " +
+                (typeFilter === "income"
+                  ? "btn-gradient-main"
+                  : "btn-soft-dark")
+              }
+              onClick={() => setTypeFilter("income")}
+            >
+              Income
+            </button>
+            <button
+              type="button"
+              className={
+                "btn btn-sm " +
+                (typeFilter === "expense"
+                  ? "btn-gradient-main"
+                  : "btn-soft-dark")
+              }
+              onClick={() => setTypeFilter("expense")}
+            >
+              Expense
+            </button>
+          </div>
 
-                return (
-                    <div
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 10,
-                        }}
-                    >
-                        <img
-                            src={`data:image/*;base64,${icon}`}
-                            className="category-icon"
-                            alt="icon"
-                        />
-                        <span style={{ fontSize: "0.95rem", fontWeight: 500 }}>
-                            {row.name}
-                        </span>
-                    </div>
-                );
-            },
-        },
+          {/* Search box */}
+          {/* <input
+            type="text"
+            className="form-control dark-input"
+            style={{ maxWidth: 260 }}
+            placeholder="Search by name..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          /> */}
+        </div>
+      </div>
 
-        {
-            field: "type",
-            headerName: "Type",
-            width: 140,
-            renderCell: (params) => <TypeBadge type={params.row.type} />,
-        },
-
-        {
-            field: "actions",
-            headerName: "Actions",
-            width: 160,
-            sortable: false,
-            filterable: false,
-            renderCell: (params) => (
-                <>
-                    <Button
-                        variant="outline-primary"
-                        size="sm"
-                        className="me-2"
-                        onClick={() => onEdit(params.row)}
-                    >
-                        Edit
-                    </Button>
-
-                    <Button
-                        variant="outline-danger"
-                        size="sm"
-                        onClick={() => onDelete(params.row)}
-                    >
-                        Delete
-                    </Button>
-                </>
-            ),
-        },
-    ];
-
-    return (
-        <>
-            {/* Filter Input */}
-            <div className="d-flex justify-content-between align-items-center mt-3 mb-2">
-                <h4 className="mb-0">Categories</h4>
-                <input
-                    type="text"
-                    className="form-control"
-                    style={{ maxWidth: 260 }}
-                    placeholder="Search by name..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                />
+      {/* Card + list (same style as transactions) */}
+      <div className="transaction-card shadow-sm">
+        <div className="list-group list-group-flush transaction-list">
+          {filteredRows.length === 0 && (
+            <div className="list-group-item transaction-list-item text-muted small px-4 py-3 text-center">
+              No categories found. Try adjusting filters or create a new
+              category.
             </div>
+          )}
 
-            {/* Income Table */}
-            <h5 className="mt-3 mb-2">Income</h5>
-            <div style={{ height: 300, width: "100%", marginBottom: "2rem" }}>
-                <DataGrid
-                    rows={incomeRows}
-                    columns={columns}
-                    pageSize={5}
-                    disableRowSelectionOnClick
-                    hideFooterSelectedRowCount
-                    localeText={{
-                        noRowsLabel: "No income categories yet. Try adding one!"
-                    }}
-                />
-            </div>
+          {filteredRows.map((row) => {
+            const icon = row.icon || CONSTANTS.DEFAULT_CATEGORY_IMAGE;
 
-            {/* Expense Table */}
-            <h5 className="mt-3 mb-2">Expense</h5>
-            <div style={{ height: 300, width: "100%" }}>
-                <DataGrid
-                    rows={expenseRows}
-                    columns={columns}
-                    pageSize={5}
-                    disableRowSelectionOnClick
-                    hideFooterSelectedRowCount
-                    localeText={{
-                        noRowsLabel: "No expense categories yet. Try adding one!"
-                    }}
-                />
-            </div>
-        </>
-    );
+            return (
+              <div
+                key={row.id}
+                className="list-group-item transaction-list-item d-flex justify-content-between align-items-center px-4 py-3"
+              >
+                {/* LEFT: icon + name + type */}
+                <div className="d-flex align-items-center gap-3">
+                  <div className="transaction-icon-wrapper">
+                    <img
+                      src={`data:image/*;base64,${icon}`}
+                      alt={row.name}
+                      className="transaction-icon"
+                    />
+                  </div>
+                
+              
+                    
+                        <div className="fw-semibold text-surface">{row.name}</div>
+                        <div><TypeBadge type={row.type} /></div>
+                
+               
+                </div>
+
+                {/* RIGHT: actions */}
+                <div className="d-flex gap-2 ms-3">
+                  <Button
+                    variant="outline-secondary"
+                    size="sm"
+                    className="btn-soft-dark"
+                    onClick={() => onEdit(row)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outline-danger"
+                    size="sm"
+                    className="btn-soft-danger"
+                    onClick={() => onDelete(row)}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
 }

@@ -1,3 +1,4 @@
+// src/components/shared/FormInput.jsx
 import Form from "react-bootstrap/Form";
 
 /**
@@ -9,38 +10,52 @@ import Form from "react-bootstrap/Form";
  * - type: text, number, email, etc.
  * - placeholder: optional
  * - formik: the Formik bag { values, errors, touched, handleChange }
- * - required: boolean (optional) → shows red asterisk if true
+ * - required: boolean (optional) → adds required-label class
+ * - inputClassName: extra classes for Form.Control (optional)
+ * - labelClassName: extra classes for Form.Label (optional)
+ * - groupClassName: extra classes for Form.Group (optional)
  */
 
 export default function FormInput({
-    label,
-    name,
-    type = "text",
-    placeholder,
-    formik,
-    required = false,
+  label,
+  name,
+  type = "text",
+  placeholder,
+  formik,
+  required = false,
+  inputClassName = "",
+  labelClassName = "",
+  groupClassName = "",
 }) {
-    return (
-        <Form.Group className="mb-3">
-            {label && (
-                <Form.Label className="fw-bold">
-                    {label}{" "}
-                    {required && <span style={{ color: "red" }}>*</span>}
-                </Form.Label>
-            )}
+  const { values, errors, touched, handleChange } = formik;
 
-            <Form.Control
-                name={name}
-                type={type}
-                placeholder={placeholder}
-                value={formik.values[name]}
-                onChange={formik.handleChange}
-                isInvalid={formik.touched[name] && !!formik.errors[name]}
-            />
+  const showError = touched[name] && !!errors[name];
 
-            <Form.Control.Feedback type="invalid">
-                {formik.errors[name]}
-            </Form.Control.Feedback>
-        </Form.Group>
-    );
+  return (
+    <Form.Group className={`mb-3 ${groupClassName}`}>
+      {label && (
+        <Form.Label
+          className={`fw-bold text-surface ${
+            required ? "required-label" : ""
+          } ${labelClassName}`}
+        >
+          {label}
+        </Form.Label>
+      )}
+
+      <Form.Control
+        name={name}
+        type={type}
+        placeholder={placeholder}
+        value={values[name]}
+        onChange={handleChange}
+        isInvalid={showError}
+        className={`dark-input ${inputClassName}`}
+      />
+
+      <Form.Control.Feedback type="invalid">
+        {errors[name]}
+      </Form.Control.Feedback>
+    </Form.Group>
+  );
 }
