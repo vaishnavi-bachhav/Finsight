@@ -1,95 +1,162 @@
-#root {
-  width: 100%;
+/* ------------- DARK GREEN LANDING THEME ------------- */
+body{
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #111827 0, #020617 55%);
 }
-p {
-  margin: 0;
-}
-.category-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  object-fit: cover;
-  background-color: transparent;
+.landing-root {
+  background: radial-gradient(circle at top left, #020617 0, #020617 40%, #000814 100%);
+  color: #e5e7eb;
 }
 
-.transaction-month {
-  border-radius: 12px;
+/* NAVBAR */
+
+.landing-nav {
+  background: rgba(10, 20, 40, 0.95);
+  backdrop-filter: blur(14px);
+  border-color: #020617 !important;
 }
 
-.transaction-month .card-header {
-  border-bottom: 1px solid #f1f1f1;
-}
-
-.transaction-icon-wrapper {
-  width: 40px;
-  height: 40px;
+.brand-logo {
+  width: 34px;
+  height: 34px;
   border-radius: 999px;
-  background-color: #f5f5f5;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  background: radial-gradient(circle at 20% 20%, #22c55e, #06b6d4);
+  color: #020617;
 }
 
-.transaction-icon {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
+.brand-name {
+  color: #f9fafb;
 }
 
-.placeholder-icon {
-  border: 1px dashed #ccc;
+.brand-sub {
+  font-size: 0.75rem;
+  color: #9ca3af;
 }
 
-.list-group-item {
-  border-color: #f5f5f5;
+.brand-badge {
+  background-color: #16a34a !important;
+  border: none;
 }
 
-/* .list-group-item:hover {
-  background-color: #fafafa;
-} */
+/* MAIN AREA */
 
-.summary-card {
-  border-radius: 12px;
+.landing-main {
+  color: #e5e7eb;
 }
 
-.transaction-chart-card {
-  border-radius: 12px;
-}
+/* Buttons */
 
-.transaction-month {
-  border-radius: 12px;
-}
-
-.transaction-month .card-header {
-  border-bottom: 1px solid #f1f1f1;
-}
-
-.transaction-icon-wrapper {
-  width: 40px;
-  height: 40px;
+.btn-ghost-light {
+  background: transparent;
   border-radius: 999px;
-  background-color: #f5f5f5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  border: 1px solid #1e293b;
+  color: #e5e7eb;
+  font-size: 0.9rem;
+  padding: 0.4rem 1rem;
 }
 
-.transaction-icon {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
+.btn-ghost-light:hover {
+  border-color: #4b5563;
+  background: rgba(15, 23, 42, 0.7);
 }
 
-.placeholder-icon {
-  border: 1px dashed #ccc;
+.btn-gradient-main {
+  border-radius: 999px;
+  padding: 0.45rem 1.4rem;
+  border: none;
+  background-image: linear-gradient(135deg, #22c55e, #06b6d4);
+  color: #02131b;
+  font-weight: 600;
+  box-shadow: 0 16px 40px rgba(34, 197, 94, 0.45);
 }
 
-.list-group-item {
-  border-color: #f5f5f5;
+.btn-gradient-main:hover {
+  filter: brightness(1.05);
 }
 
-.list-group-item:hover {
-  background-color: #fafafa;
+.btn-outline-darkglass {
+  border-radius: 999px;
+  border-color: #1e293b !important;
+  background: rgba(15, 23, 42, 0.8);
+  color: #e5e7eb;
+}
+
+.btn-outline-darkglass:hover {
+  border-color: #4b5563 !important;
+  background: rgba(30, 64, 175, 0.7);
+}
+
+/* HERO */
+
+.landing-heading {
+  color: #f9fafb;
+}
+
+.hero-accent {
+  background-image: linear-gradient(135deg, #22c55e, #06b6d4);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.landing-subtitle {
+  color: #9ca3af;
+}
+
+.hero-checklist {
+  color: #9ca3af;
+}
+
+/* CARDS */
+
+.landing-preview-card,
+.landing-feature-card {
+  background: radial-gradient(circle at top left, #020617, #020617 60%);
+  border: 1px solid #1e293b !important;
+  color: #e5e7eb;
+}
+
+.text-surface {
+  color: #f9fafb;
+}
+
+.text-muted {
+  color:        #b8c0cd !important; 
+}
+
+/* Stat cards inside hero */
+
+.stat-card {
+  background: radial-gradient(circle at top left, #052e16, #020617);
+  border-radius: 0.75rem;
+}
+
+.stat-card-expense {
+  background: radial-gradient(circle at top left, #450a0a, #020617);
+}
+
+/* Progress bars */
+
+.glass-progress {
+  height: 6px;
+  background-color: #020617;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+/* Glass tiles in "How it works" */
+
+.glass-tile {
+  background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.9), #020617);
+  border-color: #111827 !important;
+}
+
+/* Footer */
+
+.landing-footer {
+  background: #020617;
+  border-color: #020617 !important;
 }
