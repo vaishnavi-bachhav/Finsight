@@ -23,7 +23,7 @@ export default function TypeToggle({ label = "Type", name, formik, required = fa
         <Form.Group className="mb-3">
             <Form.Label className="fw-bold d-block mb-2">
                 {label}{" "}
-                {required && <span style={{ color: "red" }}>*</span>}
+                {required && <span style={{ color: "#f97373" }}>*</span>}
             </Form.Label>
 
             {/* Hidden input for Formik / FormData compatibility */}

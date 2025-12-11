@@ -3,9 +3,9 @@ import { Card, Row, Col, Badge } from "react-bootstrap";
 import { useMemo, useState } from "react";
 import useSWR from "swr";
 
-import Bar from "./Bar.jsx";
-import Donut from "./Donut.jsx";
-import NetWorth from "./NetWorth.jsx";
+import Bar from "./Bar";
+import Donut from "./Donut";
+import NetWorth from "./NetWorth";
 import useTransactions from "../../hooks/useTransactions.js";
 import { fetchFxRate } from "../../api/currencyApi.js";
 import CryptoOverview from "./CryptoOverview.jsx";
@@ -27,9 +27,201 @@ const formatCurrency = (value) =>
     maximumFractionDigits: 2,
   })}`;
 
+/* ----------------------------------------------------------------
+ * Small reusable UI pieces
+ * ---------------------------------------------------------------- */
+
+function CurrencySelectorCard({
+  targetCurrency,
+  onChangeCurrency,
+  exchangeRate,
+  fxError,
+}) {
+  return (
+    <Card className="dashboard-card shadow-sm">
+      <Card.Body className="py-2 px-3 d-flex align-items-center gap-3">
+        <div className="d-flex align-items-center gap-2">
+          <div className="icon-pill">
+            <Globe2 size={16} />
+          </div>
+          <div className="small">
+            <div className="text-muted">Display currency</div>
+            <div className="text-surface fw-semibold">
+              Base: USD → {targetCurrency}
+            </div>
+          </div>
+        </div>
+        <div className="ms-auto d-flex flex-column align-items-end">
+          <select
+            className="form-select form-select-sm fx-select"
+            value={targetCurrency}
+            onChange={(e) => onChangeCurrency(e.target.value)}
+          >
+            {CURRENCY_LIST.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+          <div className="small text-muted mt-1">
+            {fxError && <span className="text-danger">Rate unavailable</span>}
+            {!fxError && exchangeRate && (
+              <span>
+                1 USD = {exchangeRate.toFixed(4)} {targetCurrency}
+              </span>
+            )}
+          </div>
+        </div>
+      </Card.Body>
+    </Card>
+  );
+}
+
+function CashflowSnapshotCard({ snapshot }) {
+  if (!snapshot?.label) return null;
+
+  return (
+    <Card className="dashboard-card shadow-sm mb-4">
+      <Card.Body>
+        <div className="d-flex justify-content-between mb-3">
+          <div>
+            <div className="small text-muted mb-1">
+              This month&apos;s overview · {snapshot.label}
+            </div>
+            <div className="fw-bold text-surface">Cashflow Snapshot</div>
+          </div>
+          <div className="text-end small">
+            <div
+              className={
+                snapshot.net >= 0
+                  ? "text-success fw-semibold"
+                  : "text-danger fw-semibold"
+              }
+            >
+              {snapshot.net >= 0 ? "+" : "-"}
+              {formatCurrency(Math.abs(snapshot.net))}
+            </div>
+            <div className="text-muted">Net this month</div>
+          </div>
+        </div>
+
+        {/* Income / Expense tiles */}
+        <Row className="gy-3 mb-3">
+          <Col xs={6}>
+            <Card className="border-0 stat-card">
+              <Card.Body className="py-2">
+                <div className="small text-muted">Income</div>
+                <div className="fw-semibold text-success">
+                  {formatCurrency(snapshot.income)}
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col xs={6}>
+            <Card className="border-0 stat-card stat-card-expense">
+              <Card.Body className="py-2">
+                <div className="small text-muted">Expense</div>
+                <div className="fw-semibold text-danger">
+                  {formatCurrency(snapshot.expense)}
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Top expense categories + explanation */}
+        <Row className="gy-3">
+          <Col md={6}>
+            <div className="d-flex flex-column gap-2 w-100">
+              {snapshot.topExpenses.length > 0 ? (
+                snapshot.topExpenses.map((cat) => (
+                  <div key={cat.name}>
+                    <div className="d-flex justify-content-between small">
+                      <span>{cat.name}</span>
+                      <span className="text-danger">
+                        {formatCurrency(cat.amount)}
+                      </span>
+                    </div>
+                    <div className="progress glass-progress">
+                      <div
+                        className="progress-bar bg-danger"
+                        style={{
+                          width: `${Math.min(100, cat.pct).toFixed(1)}%`,
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="small text-muted">
+                  No expense categories for this month yet.
+                </div>
+              )}
+            </div>
+          </Col>
+
+          <Col
+            md={6}
+            className="d-flex flex-column align-items-center justify-content-center"
+          >
+            <PieChartIcon size={48} className="mb-2 text-primary" />
+            <div className="small text-muted text-center">
+              See where every dollar goes with clear visual breakdowns.
+            </div>
+          </Col>
+        </Row>
+      </Card.Body>
+    </Card>
+  );
+}
+
+function SummaryCard({
+  label,
+  value,
+  valueClassName,
+  badgeVariant,
+  badgeIcon: BadgeIcon,
+  badgeText,
+  targetCurrency,
+  convertedValue,
+  children,
+}) {
+  return (
+    <Card className="dashboard-card shadow-sm border-0 h-100">
+      <Card.Body>
+        <div className="d-flex justify-content-between align-items-center mb-1">
+          <span className="text-muted small">{label}</span>
+          {badgeText && (
+            <Badge bg={badgeVariant} pill className="summary-badge">
+              {BadgeIcon && <BadgeIcon size={14} className="me-1" />}
+              {badgeText}
+            </Badge>
+          )}
+        </div>
+
+        <div className={`h4 mb-1 ${valueClassName || ""}`}>{value}</div>
+
+        {targetCurrency && convertedValue != null && (
+          <div className="small text-muted mt-1">
+            {targetCurrency}:{" "}
+            {convertedValue.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+            })}
+          </div>
+        )}
+
+        {children}
+      </Card.Body>
+    </Card>
+  );
+}
+
+/* ----------------------------------------------------------------
+ * Main Dashboard component
+ * ---------------------------------------------------------------- */
+
 export default function Dashboard() {
   const { grouped, isLoading, error } = useTransactions();
-
   const [targetCurrency, setTargetCurrency] = useState("INR");
 
   // FX rate for currency conversion
@@ -126,7 +318,6 @@ export default function Dashboard() {
 
   // -----------------------------
   // “This month’s snapshot” data
-  // (for the new card like your landing preview)
   // -----------------------------
   const snapshot = useMemo(() => {
     if (!grouped?.length) {
@@ -192,246 +383,86 @@ export default function Dashboard() {
           </p>
         </Col>
         <Col md="auto" className="mt-3 mt-md-0">
-          {/* Currency selection / FX block */}
-          <Card className="dashboard-card shadow-sm">
-            <Card.Body className="py-2 px-3 d-flex align-items-center gap-3">
-              <div className="d-flex align-items-center gap-2">
-                <div className="icon-pill">
-                  <Globe2 size={16} />
-                </div>
-                <div className="small">
-                  <div className="text-muted">Display currency</div>
-                  <div className="text-surface fw-semibold">
-                    Base: USD → {targetCurrency}
-                  </div>
-                </div>
-              </div>
-              <div className="ms-auto d-flex flex-column align-items-end">
-                <select
-                  className="form-select form-select-sm fx-select"
-                  value={targetCurrency}
-                  onChange={(e) => setTargetCurrency(e.target.value)}
-                >
-                  {CURRENCY_LIST.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
-                <div className="small text-muted mt-1">
-                  {fxError && <span className="text-danger">Rate unavailable</span>}
-                  {!fxError && exchangeRate && (
-                    <span>1 USD = {exchangeRate.toFixed(4)} {targetCurrency}</span>
-                  )}
-                </div>
-              </div>
-            </Card.Body>
-          </Card>
+          <CurrencySelectorCard
+            targetCurrency={targetCurrency}
+            onChangeCurrency={setTargetCurrency}
+            exchangeRate={exchangeRate}
+            fxError={fxError}
+          />
         </Col>
       </Row>
 
-      {/* -------- New Cashflow Snapshot card (like your landing page) -------- */}
-      {snapshot.label && (
-        <Card className="dashboard-card shadow-sm mb-4">
-          <Card.Body>
-            <div className="d-flex justify-content-between mb-3">
-              <div>
-                <div className="small text-muted mb-1">
-                  This month&apos;s overview · {snapshot.label}
-                </div>
-                <div className="fw-bold text-surface">Cashflow Snapshot</div>
-              </div>
-              <div className="text-end small">
-                <div
-                  className={
-                    snapshot.net >= 0
-                      ? "text-success fw-semibold"
-                      : "text-danger fw-semibold"
-                  }
-                >
-                  {snapshot.net >= 0 ? "+" : "-"}
-                  {formatCurrency(Math.abs(snapshot.net))}
-                </div>
-                <div className="text-muted">Net this month</div>
-              </div>
-            </div>
-
-            <Row className="gy-3 mb-3">
-              <Col xs={6}>
-                <Card className="border-0 stat-card">
-                  <Card.Body className="py-2">
-                    <div className="small text-muted">Income</div>
-                    <div className="fw-semibold text-success">
-                      {formatCurrency(snapshot.income)}
-                    </div>
-                  </Card.Body>
-                </Card>
-              </Col>
-              <Col xs={6}>
-                <Card className="border-0 stat-card stat-card-expense">
-                  <Card.Body className="py-2">
-                    <div className="small text-muted">Expense</div>
-                    <div className="fw-semibold text-danger">
-                      {formatCurrency(snapshot.expense)}
-                    </div>
-                  </Card.Body>
-                </Card>
-              </Col>
-            </Row>
-
-            <Row className="gy-3">
-              <Col md={6}>
-                <div className="d-flex flex-column gap-2 w-100">
-                  {snapshot.topExpenses.length > 0 ? (
-                    snapshot.topExpenses.map((cat) => (
-                      <div key={cat.name}>
-                        <div className="d-flex justify-content-between small">
-                          <span>{cat.name}</span>
-                          <span className="text-danger">
-                            {formatCurrency(cat.amount)}
-                          </span>
-                        </div>
-                        <div className="progress glass-progress">
-                          <div
-                            className="progress-bar bg-danger"
-                            style={{
-                              width: `${Math.min(100, cat.pct).toFixed(1)}%`,
-                            }}
-                          ></div>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="small text-muted">
-                      No expense categories for this month yet.
-                    </div>
-                  )}
-                </div>
-              </Col>
-
-              <Col
-                md={6}
-                className="d-flex flex-column align-items-center justify-content-center"
-              >
-                <PieChartIcon size={48} className="mb-2 text-primary" />
-                <div className="small text-muted text-center">
-                  See where every dollar goes with clear visual breakdowns.
-                </div>
-              </Col>
-            </Row>
-          </Card.Body>
-        </Card>
-      )}
+      
 
       {/* Summary Cards */}
       <Row className="mb-4 g-3">
         {/* Income */}
         <Col md={4}>
-          <Card className="dashboard-card shadow-sm border-0 h-100">
-            <Card.Body>
-              <div className="d-flex justify-content-between align-items-center mb-1">
-                <span className="text-muted small">Total Income</span>
-                <Badge bg="success" pill className="summary-badge">
-                  <ArrowUpCircle size={14} className="me-1" /> Inflow
-                </Badge>
-              </div>
-              <div className="h4 text-success mb-1">
-                {formatCurrency(totalIncome)}
-              </div>
-
-              {exchangeRate && (
-                <div className="small text-muted mt-1">
-                  {targetCurrency}:{" "}
-                  {convert(totalIncome).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                  })}
-                </div>
-              )}
-            </Card.Body>
-          </Card>
+          <SummaryCard
+            label="Total Income"
+            value={formatCurrency(totalIncome)}
+            valueClassName="text-success"
+            badgeVariant="success"
+            badgeIcon={ArrowUpCircle}
+            badgeText="Inflow"
+            targetCurrency={exchangeRate ? targetCurrency : null}
+            convertedValue={exchangeRate ? convert(totalIncome) : null}
+          />
         </Col>
 
         {/* Expense */}
         <Col md={4}>
-          <Card className="dashboard-card shadow-sm border-0 h-100">
-            <Card.Body>
-              <div className="d-flex justify-content-between align-items-center mb-1">
-                <span className="text-muted small">Total Expense</span>
-                <Badge bg="danger" pill className="summary-badge">
-                  <ArrowDownCircle size={14} className="me-1" /> Outflow
-                </Badge>
-              </div>
-              <div className="h4 text-danger mb-1">
-                {formatCurrency(totalExpense)}
-              </div>
-
-              {exchangeRate && (
-                <div className="small text-muted mt-1">
-                  {targetCurrency}:{" "}
-                  {convert(totalExpense).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                  })}
-                </div>
-              )}
-            </Card.Body>
-          </Card>
+          <SummaryCard
+            label="Total Expense"
+            value={formatCurrency(totalExpense)}
+            valueClassName="text-danger"
+            badgeVariant="danger"
+            badgeIcon={ArrowDownCircle}
+            badgeText="Outflow"
+            targetCurrency={exchangeRate ? targetCurrency : null}
+            convertedValue={exchangeRate ? convert(totalExpense) : null}
+          />
         </Col>
 
         {/* Net Worth */}
         <Col md={4}>
-          <Card className="dashboard-card shadow-sm border-0 h-100">
-            <Card.Body>
-              <div className="d-flex justify-content-between align-items-center mb-1">
-                <span className="text-muted small">Current Net Worth</span>
-                <div className="icon-pill icon-pill-soft">
-                  <Wallet size={16} />
-                </div>
-              </div>
-
-              <div
-                className={`h4 mb-1 ${
-                  currentNetWorth >= 0 ? "text-success" : "text-danger"
-                }`}
-              >
-                {currentNetWorth >= 0 ? "+" : "-"}
-                {formatCurrency(Math.abs(currentNetWorth))}
-              </div>
-
-              {exchangeRate && (
-                <div className="small text-muted mt-1">
-                  {targetCurrency}:{" "}
-                  {convert(currentNetWorth).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                  })}
+          <SummaryCard
+            label="Current Net Worth"
+            value={
+              (currentNetWorth >= 0 ? "+" : "-") +
+              formatCurrency(Math.abs(currentNetWorth))
+            }
+            valueClassName={
+              currentNetWorth >= 0 ? "text-success" : "text-danger"
+            }
+            targetCurrency={exchangeRate ? targetCurrency : null}
+            convertedValue={exchangeRate ? convert(currentNetWorth) : null}
+          >
+            <div className="mt-2 small">
+              {bestMonthLabel && (
+                <div>
+                  <span className="text-muted">Best month: </span>
+                  <strong>{bestMonthLabel}</strong>{" "}
+                  <span className="text-success">
+                    (+{formatCurrency(bestMonthNet)})
+                  </span>
                 </div>
               )}
-
-              {/* Best / Worst */}
-              <div className="mt-2 small">
-                {bestMonthLabel && (
-                  <div>
-                    <span className="text-muted">Best month: </span>
-                    <strong>{bestMonthLabel}</strong>{" "}
-                    <span className="text-success">
-                      (+{formatCurrency(bestMonthNet)})
-                    </span>
-                  </div>
-                )}
-                {worstMonthLabel && (
-                  <div>
-                    <span className="text-muted">Worst month: </span>
-                    <strong>{worstMonthLabel}</strong>{" "}
-                    <span className="text-danger">
-                      (-{formatCurrency(Math.abs(worstMonthNet))})
-                    </span>
-                  </div>
-                )}
-              </div>
-            </Card.Body>
-          </Card>
+              {worstMonthLabel && (
+                <div>
+                  <span className="text-muted">Worst month: </span>
+                  <strong>{worstMonthLabel}</strong>{" "}
+                  <span className="text-danger">
+                    (-{formatCurrency(Math.abs(worstMonthNet))})
+                  </span>
+                </div>
+              )}
+            </div>
+          </SummaryCard>
         </Col>
       </Row>
-
+              {/* Cashflow Snapshot card */}
+      <CashflowSnapshotCard snapshot={snapshot} />
       {/* Cashflow + Net Worth */}
       <Row className="mb-4 g-3">
         <Col lg={7}>
