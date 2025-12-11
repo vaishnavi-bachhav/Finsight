@@ -1,5 +1,5 @@
 // src/components/transaction/Transaction.jsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import useSWR, { mutate } from "swr";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
@@ -23,6 +23,16 @@ import {
 } from "../../api/transactionApi.js";
 import { fetchCategories } from "../../api/categoryApi.js";
 
+// Optional icons (lucide-react) – already used elsewhere in your app
+import {
+  ListFilter,
+  PlusCircle,
+  CalendarRange,
+  ArrowUpCircle,
+  ArrowDownCircle,
+  Wallet,
+} from "lucide-react";
+
 // ---- Helpers ---------------------------------------------------
 
 const txFetcher = async () => await fetchTransactions();
@@ -34,7 +44,6 @@ const formatMoney = (value = 0) =>
     maximumFractionDigits: 2,
   });
 
-// how many months per page
 const PAGE_SIZE = 3;
 
 // Yup validation (also blocks future dates)
@@ -60,9 +69,9 @@ export default function Transaction() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // filters
-  const [typeFilter, setTypeFilter] = useState("all");     // all | income | expense
-  const [categoryFilter, setCategoryFilter] = useState("all"); // category _id | "all"
-  const [monthFilter, setMonthFilter] = useState("all");   // month label | "all"
+  const [typeFilter, setTypeFilter] = useState("all"); // all | income | expense
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [monthFilter, setMonthFilter] = useState("all");
   const [page, setPage] = useState(1);
 
   // Transactions (grouped by month)
@@ -126,6 +135,24 @@ export default function Transaction() {
     }
   };
 
+  // -------- Global quick stats (for header badges) --------------
+  const globalStats = useMemo(() => {
+    if (!grouped.length) {
+      return { totalIncome: 0, totalExpense: 0, net: 0 };
+    }
+    let totalIncome = 0;
+    let totalExpense = 0;
+    grouped.forEach((m) => {
+      totalIncome += m.totalIncome || 0;
+      totalExpense += m.totalExpense || 0;
+    });
+    return {
+      totalIncome,
+      totalExpense,
+      net: totalIncome - totalExpense,
+    };
+  }, [grouped]);
+
   // ---------- Filtering & pagination -----------------------------
 
   // reset to page 1 whenever filters change
@@ -133,43 +160,34 @@ export default function Transaction() {
     setPage(1);
   }, [typeFilter, categoryFilter, monthFilter]);
 
-  // apply filters to month groups and to the transactions inside
   const filteredGroups = grouped.reduce((acc, group) => {
-    // month filter
+    // month filter (card-level)
     if (monthFilter !== "all" && group.month !== monthFilter) {
       return acc;
     }
 
-    // filter transactions inside the month
-    const visibleTransactions = group.transactions.filter((tx) => {
+    // apply transaction-level filters
+    const filteredTx = group.transactions.filter((tx) => {
       if (typeFilter !== "all" && tx.type !== typeFilter) return false;
-      if (
-        categoryFilter !== "all" &&
-        tx.category &&
-        tx.category._id !== categoryFilter
-      ) {
-        return false;
+
+      if (categoryFilter !== "all") {
+        if (!tx.category?._id) return false;
+        if (tx.category._id !== categoryFilter) return false;
       }
-      if (categoryFilter !== "all" && !tx.category && categoryFilter !== "all") {
-        return false;
-      }
+
       return true;
     });
 
-    // if type/category filters are active and this month has no visible tx,
-    // skip the whole month card
     const filtersActive =
       typeFilter !== "all" || categoryFilter !== "all" || monthFilter !== "all";
 
-    if (filtersActive && visibleTransactions.length === 0) {
+    if (filtersActive && filteredTx.length === 0) {
       return acc;
     }
 
     acc.push({
       ...group,
-      visibleTransactions: visibleTransactions.length
-        ? visibleTransactions
-        : group.transactions,
+      visibleTransactions: filteredTx.length ? filteredTx : group.transactions,
     });
     return acc;
   }, []);
@@ -200,33 +218,72 @@ export default function Transaction() {
   // ------------------------------------------------------------------
   return (
     <>
-      {/* Top bar */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
+      {/* Top bar with quick stats */}
+      <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
         <div>
-          <h4 className="mb-0 fw-semibold text-surface">Transactions</h4>
+          <h4 className="mb-1 fw-semibold text-surface d-flex align-items-center gap-2">
+            <CalendarRange size={20} />
+            Transactions
+          </h4>
           <small className="text-muted">
-            Track your income and expenses month by month.
+            Add, review, and manage your monthly income and expenses.
           </small>
         </div>
-        <Button
-          variant="primary"
-          className="btn-gradient-main"
-          onClick={() => {
-            setEditing(null);
-            setShow(true);
-          }}
-        >
-          + New Transaction
-        </Button>
+
+        {/* Quick stats pills */}
+        <div className="d-flex flex-wrap gap-2">
+          <div className="mini-stat-pill">
+            <ArrowUpCircle size={14} className="text-success me-1" />
+            <span className="label">Total Income</span>
+            <span className="value text-success">
+              ${formatMoney(globalStats.totalIncome)}
+            </span>
+          </div>
+          <div className="mini-stat-pill">
+            <ArrowDownCircle size={14} className="text-danger me-1" />
+            <span className="label">Total Expense</span>
+            <span className="value text-danger">
+              ${formatMoney(globalStats.totalExpense)}
+            </span>
+          </div>
+          <div className="mini-stat-pill">
+            <Wallet size={14} className="me-1" />
+            <span className="label">Net</span>
+            <span
+              className={
+                "value " +
+                (globalStats.net >= 0 ? "text-success" : "text-danger")
+              }
+            >
+              {globalStats.net >= 0 ? "+" : "-"}$
+              {formatMoney(Math.abs(globalStats.net))}
+            </span>
+          </div>
+
+          <Button
+            variant="primary"
+            className="btn-gradient-main d-flex align-items-center ms-1 "
+            onClick={() => {
+              setEditing(null);
+              setShow(true);
+            }}
+          >
+            <PlusCircle size={16} className="me-1" />
+            New Transaction
+          </Button>
+        </div>
       </div>
 
       {/* Filter bar */}
       <div className="transaction-filters mb-4 p-3 rounded-4">
         <Row className="g-3 align-items-end">
-          <Col md={4}>
-            <Form.Label className="fw-semibold text-muted small">
-              Type
-            </Form.Label>
+          <Col xs={12} md={3}>
+            <div className="d-flex align-items-center gap-1 mb-1">
+              <ListFilter size={14} className="text-muted" />
+              <Form.Label className="fw-semibold text-muted small mb-0">
+                Type
+              </Form.Label>
+            </div>
             <Form.Select
               size="sm"
               className="dark-input"
@@ -239,7 +296,7 @@ export default function Transaction() {
             </Form.Select>
           </Col>
 
-          <Col md={4}>
+          <Col xs={12} md={4}>
             <Form.Label className="fw-semibold text-muted small">
               Category
             </Form.Label>
@@ -258,7 +315,7 @@ export default function Transaction() {
             </Form.Select>
           </Col>
 
-          <Col md={3}>
+          <Col xs={12} md={3}>
             <Form.Label className="fw-semibold text-muted small">
               Month
             </Form.Label>
@@ -277,7 +334,7 @@ export default function Transaction() {
             </Form.Select>
           </Col>
 
-          <Col md={1} className="text-md-end">
+          <Col xs={12} md={2} className="text-md-end">
             <Button
               size="sm"
               variant="outline-secondary"
@@ -288,7 +345,7 @@ export default function Transaction() {
                 setMonthFilter("all");
               }}
             >
-              Clear
+              Reset filters
             </Button>
           </Col>
         </Row>
@@ -331,7 +388,7 @@ export default function Transaction() {
               <Form noValidate onSubmit={handleSubmit}>
                 <Modal.Header closeButton className="dark-modal-header">
                   <Modal.Title className="text-surface">
-                    {editing ? "Edit Transaction" : "Add Transaction"}
+                    {editing ? "Edit transaction" : "Add transaction"}
                   </Modal.Title>
                 </Modal.Header>
 
@@ -355,7 +412,7 @@ export default function Transaction() {
                       }`}
                       placeholderText="Select date"
                       calendarClassName="dark-datepicker"
-                      maxDate={new Date()} // prevent future dates
+                      maxDate={new Date()}
                       dateFormat="MM/dd/yyyy"
                     />
 
@@ -438,14 +495,14 @@ export default function Transaction() {
                     onClick={handleClose}
                     className="btn-soft-dark"
                   >
-                    Close
+                    Cancel
                   </Button>
                   <Button
                     variant="primary"
                     type="submit"
                     className="btn-gradient-main"
                   >
-                    {editing ? "Save Changes" : "Add Transaction"}
+                    {editing ? "Save changes" : "Add transaction"}
                   </Button>
                 </Modal.Footer>
               </Form>
@@ -454,7 +511,7 @@ export default function Transaction() {
         </Formik>
       </Modal>
 
-      {/* Delete modal */}
+      {/* Delete modal (already themed via your DeleteConfirmation.css) */}
       <DeleteConfirmation
         show={showDeleteModal}
         onCancel={() => setShowDeleteModal(false)}
@@ -468,8 +525,12 @@ export default function Transaction() {
           <div key={month} className="transaction-card mb-4 shadow-sm">
             {/* Card header */}
             <div className="transaction-header d-flex justify-content-between align-items-center px-4 pt-3 pb-2">
-              <div className="d-flex align-items-center gap-2">
+              <div className="d-flex flex-column">
                 <h5 className="mb-0 fw-semibold text-surface">{month}</h5>
+                <span className="small text-muted">
+                  {transactions.length} transaction
+                  {transactions.length === 1 ? "" : "s"}
+                </span>
               </div>
 
               <div className="d-flex flex-wrap gap-3 text-end small">
