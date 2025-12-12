@@ -36,8 +36,8 @@ Fully configured Dev Container
 
 🚀 Getting Started
 1. Clone the repo
-```git clone https://github.com/YOUR_USERNAME/FinSight.git
-cd FinSight```
+``` git clone https://github.com/vaishnavi-bachhav/Finsight
+cd Finsight ```
 
 2. Open in VS Code Dev Container
 
