@@ -1,13 +1,19 @@
-// src/api/transactionApi.js
 import api from "./axiosClient.js";
 
-const TRANSACTION_URL = `/transaction`;
+const TRANSACTION_URL = "/transaction";
 
 // GET: grouped transactions
 export const fetchTransactions = async () => {
-  const response = await api.get(TRANSACTION_URL);
-  // returns [{ month, transactions: [...] }, ...]
-  return response.data;
+  try {
+    const response = await api.get(TRANSACTION_URL);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to get transactions:", error);
+    throw new Error(
+      error.response?.data?.message ||
+      "Unable to get transactions. Please try again later."
+    );
+  }
 };
 
 // POST
