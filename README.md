@@ -1,16 +1,54 @@
-# React + Vite
+## FinSight – Personal Finance Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack financial tracking app with authentication, charts, transactions, and testing.
 
-Currently, two official plugins are available:
+✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Google/Clerk Authentication
 
-## React Compiler
+Add/Edit/Delete Transactions
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Add/Edit/Delete Categories
 
-## Expanding the ESLint configuration
+Monthly breakdowns & summaries
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Beautiful charts (AG Charts)
+
+Dark theme UI
+
+Currency conversion (external API)
+
+Crypto overview via CoinGecko API
+
+Playwright E2E Testing
+
+Fully configured Dev Container
+
+🧱 Tech Stack
+| Layer | Tech |
+|-----:|-----------|
+|Frontend|	React + Vite + Bootstrap + AG Charts|
+|Backend|	Node.js (Express), MongoDB|
+|Auth|	Clerk|
+|Testing|	Playwright|
+|Dev Environment|	VS Code Dev Container|
+|Deployment|	Google Cloud Provider|
+
+🚀 Getting Started
+1. Clone the repo
+```git clone https://github.com/YOUR_USERNAME/FinSight.git
+cd FinSight```
+
+2. Open in VS Code Dev Container
+
+Make sure you have:
+
+VS Code
+
+Dev Containers extension
+
+Docker running
+
+Then press:
+Ctrl + Shift + P → “Dev Containers: Reopen in Container”
+All dependencies will auto-install.
