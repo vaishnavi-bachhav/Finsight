@@ -85,15 +85,11 @@ The application is built using **React (Vite)** on the frontend, **Express + Mon
 
 FinSight follows a **modern client-server architecture**:
 
-- **Frontend (React + Vite)**  
-  Handles UI, charts, routing, and user interaction.
-- **Authentication (Clerk)**  
-  Manages secure login, session handling, and protected routes.
-- **Backend (Express API)**  
-  Handles business logic, data validation, and aggregation.
-- **Database (MongoDB Atlas)**  
-  Stores users’ categories and transactions.
-- **External APIs**
+- **Frontend (React + Vite)**  Handles UI, charts, routing, and user interaction.
+- **Authentication (Clerk)**   Manages secure login, session handling, and protected routes.
+- **Backend (Express API)**    Handles business logic, data validation, and aggregation.
+- **Database (MongoDB Atlas)** Stores users’ categories and transactions.
+- **External APIs**         
   - Currency exchange rates
   - Crypto prices (CoinGecko)
   - Inflation insights 
