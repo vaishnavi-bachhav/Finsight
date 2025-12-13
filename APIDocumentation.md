@@ -17,7 +17,6 @@ The API is deployed on **Google Cloud Run** and serves a React frontend hosted s
 ### Authorization Header
 All protected endpoints require:
 
-```http
 Authorization: Bearer <CLERK_JWT>
 
 If authentication fails, the API returns:
@@ -26,13 +25,15 @@ If authentication fails, the API returns:
 { "message": "Not authenticated" }
 ```
 
-** 🌍 Base URLs **
+## 🌍 Base URLs 
 | Environment |	Base URL |
 | ------------| ---------|
 | Local | http://localhost:8080 |
 | Production |https://finsight-api-834761250594.us-central1.run.app |
 
-❤️ Health Status Endpoints (Public)
+---
+
+❤️ Health Status Endpoints (Public) 
 GET `/health`
 
 Used by Cloud Run for health checks.
@@ -47,6 +48,8 @@ Response
   "timestamp": "2025-12-13T00:00:00.000Z"
 }
 ```
+
+---
 
 ## 🗂️ Categories API (Protected) 
 
@@ -131,6 +134,7 @@ Response
 ⚠️ Important Behavior
 **Transactions linked to a deleted category are not deleted. They will appear as “Uncategorized” in transaction results**
 
+---
 
 ## 💸 Transactions API (Protected)
 
@@ -211,6 +215,8 @@ Response
 { "message": "Transaction deleted successfully" }
 ```
 
+---
+
 ## 💱 Currency API (Public)
 Base path: `/currency`
 Authentication: ❌ Not required
@@ -238,6 +244,8 @@ Response
 }
 ```
 
+---
+
 ## 📉 Inflation API (Public)
 Base path: `/inflation`
 Authentication: ❌ Not required
@@ -264,6 +272,8 @@ Response
 }
 ```
 ⏱ Cached for 12 hours to reduce API usage.
+
+---
 
 ## ⚙️ CORS Configuration
 The API allows requests from:
