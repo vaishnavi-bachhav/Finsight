@@ -129,6 +129,12 @@ flowchart TB
 ## API Documentation
 Detailed API Documentation is available on : [FinSight API](https://github.com/vaishnavi-bachhav/Finsight/blob/main/APIDocumentation.md).
 
+---
+
+## Setup Instructions
+Detailed setup instructions are available on : [Guide to setup application in local](https://github.com/vaishnavi-bachhav/Finsight/blob/main/SetupInstructions.md).
+
+---
 
 🚀 Getting Started
 1. Clone the repo
