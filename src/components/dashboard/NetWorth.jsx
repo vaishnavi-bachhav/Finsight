@@ -5,23 +5,22 @@ import useTransactions from "../../hooks/useTransactions";
 export default function NetWorth() {
   const { grouped, isLoading, error } = useTransactions();
 
-  const data = useMemo(() => {
-    if (!grouped?.length) return [];
+ const data = useMemo(() => {
+  if (!grouped?.length) return [];
 
-    return grouped.reduce((acc, m) => {
-      const previousNet = acc.length > 0 ? acc[acc.length - 1].net : 0;
+  // grouped is usually newest -> oldest, so reverse for cumulative
+  const chronological = [...grouped].reverse();
 
-      const net =
-        previousNet + (m.totalIncome || 0) - (m.totalExpense || 0);
+  return chronological.reduce((acc, m) => {
+    const previousNet = acc.length > 0 ? acc[acc.length - 1].net : 0;
 
-      acc.push({
-        month: m.month,
-        net,
-      });
+const net = previousNet + Number(m.totalIncome || 0) - Number(m.totalExpense || 0);
 
-      return acc;
-    }, []);
-  }, [grouped]);
+    acc.push({ month: m.month, net });
+    return acc;
+  }, []);
+}, [grouped]);
+
 
   const noData = !data.length;
 
