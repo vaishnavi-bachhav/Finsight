@@ -1,5 +1,5 @@
 // src/components/category/Category.jsx
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import useSWR, { mutate } from "swr";
 import CategoryTable from "./CategoryTable.jsx";
 import DeleteConfirmation from "../shared/DeleteConfirmation.jsx";
@@ -21,30 +21,39 @@ import {
 // SWR fetcher
 const swrFetcher = async () => await fetchCategories();
 
-// Validation schema (same logic, themed labels handled via CSS)
-const validationSchema = Yup.object({
-  name: Yup.string()
-    .trim()
-    .required("Name is required")
-    .test("unique-name", "Name must be unique", function (value) {
-    //  const { parent } = this;
-      const { people, editingProfile } = this.options.context || {};
-      if (!value || !people) return false;
+/**
+ * Factory so schema always uses latest people/editingProfile (no context issues).
+ * This completely avoids the “context not passed / undefined” issue.
+ */
+function buildValidationSchema(people, editingProfile) {
+  return Yup.object({
+    name: Yup.string()
+      .trim()
+      .required("Name is required")
+      .test("unique-name", "Name must be unique", function (value) {
+        const v = (value || "").trim().toLowerCase();
+        if (!v) return true; // required() handles empty
 
-      return !people.some((p) => {
-        const isSameRecord =
-          editingProfile &&
-          (p.id === editingProfile.id || p._id === editingProfile._id);
+        // If people not loaded yet, do NOT fail validation
+        if (!Array.isArray(people)) return true;
 
-        if (isSameRecord) return false;
+        return !people.some((p) => {
+          const sameEditing =
+            editingProfile &&
+            ((p.id && editingProfile.id && p.id === editingProfile.id) ||
+              (p._id && editingProfile._id && p._id === editingProfile._id));
 
-        return p.name.toLowerCase() === value.toLowerCase();
-      });
-    }),
-  type: Yup.string()
-    .oneOf(["income", "expense"], "Type is required")
-    .required("Type is required"),
-});
+          if (sameEditing) return false;
+
+          return ((p.name || "").trim().toLowerCase() === v);
+        });
+      }),
+
+    type: Yup.string()
+      .oneOf(["income", "expense"], "Type is required")
+      .required("Type is required"),
+  });
+}
 
 export default function Category() {
   const [show, setShow] = useState(false);
@@ -60,7 +69,12 @@ export default function Category() {
     isLoading,
   } = useSWR("categories", swrFetcher);
 
-  // Close modal + reset
+  // Build schema with current state (most reliable)
+  const validationSchema = useMemo(
+    () => buildValidationSchema(people, editingProfile),
+    [people, editingProfile]
+  );
+
   const handleClose = () => {
     setShow(false);
     setIcon("");
@@ -82,12 +96,12 @@ export default function Category() {
     try {
       await deleteCategory(deleteTarget._id || deleteTarget.id);
       mutate("categories");
-    } catch (error) {
-      console.error("Delete failed:", error);
+    } catch (err) {
+      console.error("Delete failed:", err);
+    } finally {
+      setShowDeleteModal(false);
+      setDeleteTarget(null);
     }
-
-    setShowDeleteModal(false);
-    setDeleteTarget(null);
   };
 
   // Convert icon to base64
@@ -107,24 +121,27 @@ export default function Category() {
     const iconToSave =
       icon || editingProfile?.icon || CONSTANTS.DEFAULT_CATEGORY_IMAGE;
 
-    if (editingProfile) {
-      await updateCategory(editingProfile._id || editingProfile.id, {
-        name: values.name,
-        type: values.type,
-        icon: iconToSave,
-      });
-      mutate("categories");
-    } else {
-      await addCategory({
-        name: values.name,
-        type: values.type,
-        icon: iconToSave,
-      });
-      mutate("categories");
-    }
+    try {
+      if (editingProfile) {
+        await updateCategory(editingProfile._id || editingProfile.id, {
+          name: values.name.trim(),
+          type: values.type,
+          icon: iconToSave,
+        });
+      } else {
+        await addCategory({
+          name: values.name.trim(),
+          type: values.type,
+          icon: iconToSave,
+        });
+      }
 
-    resetForm();
-    handleClose();
+      mutate("categories");
+      resetForm();
+      handleClose();
+    } catch (err) {
+      console.error("Save failed:", err);
+    }
   };
 
   // Loading & Error States
@@ -171,17 +188,8 @@ export default function Category() {
           validationSchema={validationSchema}
           onSubmit={handleFormSubmit}
           enableReinitialize
-          // pass SWR data into Yup test context for uniqueness
-          context={{ people, editingProfile }}
         >
-          {({
-            handleSubmit,
-            handleChange,
-            values,
-            errors,
-            touched,
-            setFieldValue,
-          }) => (
+          {({ handleSubmit, handleChange, values, errors, touched, setFieldValue }) => (
             <Form noValidate onSubmit={handleSubmit}>
               <Modal.Header closeButton className="dark-modal-header">
                 <Modal.Title className="text-surface">
@@ -203,20 +211,14 @@ export default function Category() {
                   placeholder="Enter category name"
                   formik={{ values, errors, touched, handleChange }}
                   required
-                  // if your FormInput supports passing a class to the input:
                   inputClassName="dark-input"
                   labelClassName="required-label fw-bold"
                 />
 
-                {/* Type (income / expense) */}
+                {/* Type */}
                 <TypeToggle
                   name="type"
-                  formik={{
-                    values,
-                    errors,
-                    touched,
-                    setFieldValue,
-                  }}
+                  formik={{ values, errors, touched, setFieldValue }}
                   required
                 />
 
@@ -236,9 +238,7 @@ export default function Category() {
                     <div className="mt-3 d-flex align-items-center gap-3">
                       <div className="small text-muted">Preview:</div>
                       <img
-                        src={`data:image/*;base64,${
-                          icon || editingProfile?.icon
-                        }`}
+                        src={`data:image/*;base64,${icon || editingProfile?.icon}`}
                         alt="Icon preview"
                         className="img-thumbnail"
                         style={{ width: 48, height: 48, borderRadius: 12 }}
@@ -271,7 +271,7 @@ export default function Category() {
         </Formik>
       </Modal>
 
-      {/* Delete Confirmation (already themed in your DeleteConfirmation.jsx) */}
+      {/* Delete Confirmation */}
       <DeleteConfirmation
         show={showDeleteModal}
         onCancel={() => setShowDeleteModal(false)}
@@ -279,7 +279,7 @@ export default function Category() {
         deleteTarget={deleteTarget}
       />
 
-      {/* Table */}
+      {/* List */}
       <CategoryTable
         category={people}
         onDelete={confirmDelete}
