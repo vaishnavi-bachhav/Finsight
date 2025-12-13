@@ -5,6 +5,32 @@ The application is built using **React (Vite)** on the frontend, **Express + Mon
 
 ---
 
+## 🔗 Project Links
+
+### 🌐 Live Application
+- **Frontend (Live URL):**  
+  https://finsight-120798-77dca.web.app/
+
+- **Backend API (Cloud Run):**  
+  https://finsight-api-834761250594.us-central1.run.app
+
+---
+
+### 🎥 Demo
+- **Demo Video:**  
+  _Coming soon_  
+
+---
+
+### 📂 Source Code
+- **Frontend Repository:**  
+  https://github.com/vaishnavi-bachhav/Finsight
+
+- **Backend Repository:**  
+  https://github.com/vaishnavi-bachhav/FinSight.API
+
+---
+
 ## ✨ Features
 
 ### 🔐 Secure Authentication
@@ -127,80 +153,35 @@ flowchart TB
 ![sequence diagram](<sequence -finsight-1.png>)
 
 ## API Documentation
-Detailed API Documentation is available on : [FinSight API](https://github.com/vaishnavi-bachhav/Finsight/blob/main/APIDocumentation.md).
+Detailed API Documentation is available on : [FinSight API](https://github.com/vaishnavi-bachhav/Finsight/blob/main/documentation/APIDocumentation.md).
 
 ---
 
 ## Setup Instructions
-Detailed setup instructions are available on : [Guide to setup application in local](https://github.com/vaishnavi-bachhav/Finsight/blob/main/SetupInstructions.md).
+Detailed setup instructions are available on : [Guide to setup application in local](https://github.com/vaishnavi-bachhav/Finsight/blob/main/documentation/SetupInstructions.md).
+
+---
+## Deployment Guide
+Detailed deployment guide is available on : [Deployment Guide](https://github.com/vaishnavi-bachhav/Finsight/blob/main/documentation/DeploymentGuide.md).
 
 ---
 
-🚀 Getting Started
-1. Clone the repo
-```
-git clone https://github.com/vaishnavi-bachhav/Finsight
-cd Finsight 
-```
+## 📚 Attribution of External Sources
 
-2. Open in VS Code Dev Container
+### LLM Models
+- ChatGPT
 
-Make sure you have:
+- Playwright Testing - https://playwright.dev/docs/intro
+- Clerk Authentication – https://clerk.com/
+- AG Charts - https://www.ag-grid.com/charts/react/quick-start/
+- CoinGecko API – https://docs.coingecko.com/
+- Frankfurter API - https://frankfurter.dev/
+- WorldBank API - https://documents.worldbank.org/en/publication/documents-reports/api
+- Eraser - https://www.eraser.io/ai/sequence-diagram-generator
 
-- VS Code
-- Dev Containers extension
-- Docker running
+## Playwright test report
 
-Then press:
-```
-Ctrl + Shift + P → “Dev Containers: Reopen in Container”
-```
-All dependencies will auto-install.
+![playwright test report](image.png)
 
 
-🔧 Environment Variables
 
-Create .env in frontend/:
-
-```
-VITE_CLERK_PUBLISHABLE_KEY=pk_test_xxxxxxxxxxxxxxxxxxxx
-VITE_API_BASE=http://localhost:3000
-```
-
-Create .env in backend/:
-
-```
-CLERK_SECRET_KEY=sk_test_xxxxxxxxxxxxxxxx
-MONGO_URI=your_mongodb_atlas_url
-COINGECKO_API_BASE=https://api.coingecko.com/api/v3
-CURRENCY_API_BASE=https://api.exchangerate.host
-```
-
-▶️ Run Frontend
-
-```
-cd frontend
-npm install
-npm run dev
-```
-
-▶️ Run Backend
-
-```
-cd backend
-npm install
-node server.js
-```
-
-
-📚 Attribution of External Sources
-
-Clerk Authentication – https://clerk.dev
-
-CoinGecko API – https://www.coingecko.com
-
-Exchange Rate APIs – public exchange-rate services
-
-AG Charts – https://www.ag-grid.com
-
-React Bootstrap – https://react-bootstrap.github.io

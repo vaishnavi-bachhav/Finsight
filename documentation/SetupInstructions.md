@@ -41,7 +41,8 @@ This is the **preferred setup** for grading and collaboration.
    ```
 
 2. Open the project in VS Code:
-```code .
+```
+code .
 ```
 3. When prompted, select: `Reopen in Container`
 
@@ -120,7 +121,7 @@ Frontend includes Playwright end-to-end tests.
 ```
 cd Finsight
 npx playwright install
-npx playwright test
+npx playwright test --host 0.0.0.0
 ```
 
 Test coverage includes:
