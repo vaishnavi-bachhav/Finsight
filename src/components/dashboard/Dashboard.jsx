@@ -18,6 +18,7 @@ import {
   Globe2,
   PieChart as PieChartIcon,
 } from "lucide-react";
+import InflationCard from "./Inflation.jsx";
 
 const CURRENCY_LIST = ["INR", "EUR", "GBP", "JPY", "AUD", "CAD"];
 
@@ -531,6 +532,8 @@ export default function Dashboard() {
           <CryptoOverview />
         </Card.Body>
       </Card>
+
+      <InflationCard/>
     </div>
   );
 }
