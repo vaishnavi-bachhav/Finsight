@@ -126,6 +126,8 @@ flowchart TB
 
 ![sequence diagram](<sequence -finsight-1.png>)
 
+## API Documentation
+Detailed API Documentation is available on : [FinSight API](https://github.com/vaishnavi-bachhav/Finsight/blob/main/APIDocumentation.md).
 
 
 🚀 Getting Started
