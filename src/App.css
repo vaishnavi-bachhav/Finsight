@@ -1037,3 +1037,11 @@ body{
   }
 }
 /* -------------------------------------------------- */
+.btn-soft-dark {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: #e5e7eb;
+}
+.btn-soft-dark:hover {
+  background: rgba(255,255,255,0.10);
+}
