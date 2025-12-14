@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { AgCharts } from "ag-charts-react";
 import useTransactions from "../../hooks/useTransactions.js";
 
-// helper: "Dec 2023" -> Date(2023-12-01)
+// Helper: convert "Dec 2023" -> Date object
 const monthLabelToDate = (label) => {
   const d = new Date(`${label} 1`);
   return Number.isNaN(d.getTime()) ? null : d;
@@ -11,10 +11,9 @@ const monthLabelToDate = (label) => {
 export default function Bar() {
   const { grouped, isLoading, error } = useTransactions();
 
-  // Filter: all | 3 | 6 | 12
-  const [range, setRange] = useState("all");
+  const [range, setRange] = useState("all"); // Filter range: all | 3 | 6 | 12 months
 
-  // ---- apply range filter to grouped (month-level) ----
+  // Apply range filter to grouped data
   const filteredGrouped = useMemo(() => {
     if (!grouped?.length) return [];
     if (range === "all") return grouped;
@@ -26,27 +25,21 @@ export default function Bar() {
 
     return grouped.filter((m) => {
       const md = monthLabelToDate(m.month);
-      if (!md) return true; // if parsing fails, keep it
+      if (!md) return true;
       return md >= new Date(cutoff.getFullYear(), cutoff.getMonth(), 1);
     });
   }, [grouped, range]);
 
-  // -----------------------------
-  // Detect no data (after filter)
-  // -----------------------------
+  // Detect if filtered data has no income/expense
   const noData =
     !filteredGrouped?.length ||
     filteredGrouped.every(
       (m) => (m.totalIncome ?? 0) === 0 && (m.totalExpense ?? 0) === 0
     );
 
-  // -----------------------------
-  // Compute chart + top categories based on filteredGrouped
-  // -----------------------------
+  // Compute chart data and top categories
   const { chartData, topIncomeCats, topExpenseCats } = useMemo(() => {
-    if (noData) {
-      return { chartData: [], topIncomeCats: [], topExpenseCats: [] };
-    }
+    if (noData) return { chartData: [], topIncomeCats: [], topExpenseCats: [] };
 
     const rows = [];
     const incomeCatTotals = {};
@@ -83,16 +76,12 @@ export default function Bar() {
     };
   }, [filteredGrouped, noData]);
 
-  // -----------------------------
-  // Chart options (DARK THEME)
-  // -----------------------------
+  // Chart configuration (dark theme)
   const options = useMemo(() => {
     if (noData) return null;
 
     return {
-      theme: {
-        baseTheme: "ag-default-dark",
-      },
+      theme: { baseTheme: "ag-default-dark" },
       background: { fill: "#020617" },
       title: { text: "Monthly Income vs Expense" },
       subtitle: {
@@ -114,9 +103,7 @@ export default function Bar() {
           label: {
             color: "#e5e7eb",
             formatter: ({ value }) =>
-              `$${Number(value).toLocaleString(undefined, {
-                maximumFractionDigits: 0,
-              })}`,
+              `$${Number(value).toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
           },
         },
       ],
@@ -124,15 +111,13 @@ export default function Bar() {
     };
   }, [noData, chartData, range]);
 
-  // -----------------------------
-  // UI
-  // -----------------------------
+  // ---------------- UI ----------------
   if (isLoading) return <p>Loading chart…</p>;
   if (error) return <p className="text-danger">Failed to load chart.</p>;
 
   return (
     <div>
-      {/* Filter row */}
+      {/* Range filter dropdown */}
       <div className="d-flex justify-content-end mb-2">
         <select
           className="form-select form-select-sm dark-input"
@@ -158,6 +143,7 @@ export default function Bar() {
 
           <hr className="border-secondary" />
 
+          {/* Top categories */}
           <div className="row">
             <div className="col-md-6">
               <h6 className="fw-semibold text-light">Top Income Categories</h6>

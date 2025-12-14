@@ -1,4 +1,3 @@
-// src/components/category/Category.jsx
 import { useState, useMemo } from "react";
 import useSWR, { mutate } from "swr";
 import CategoryTable from "./CategoryTable.jsx";
@@ -18,13 +17,10 @@ import {
   deleteCategory,
 } from "../../api/categoryApi.js";
 
-// SWR fetcher
+// SWR fetcher for categories
 const swrFetcher = async () => await fetchCategories();
 
-/**
- * Factory so schema always uses latest people/editingProfile (no context issues).
- * This completely avoids the “context not passed / undefined” issue.
- */
+/** Builds validation schema dynamically */
 function buildValidationSchema(people, editingProfile) {
   return Yup.object({
     name: Yup.string()
@@ -32,9 +28,8 @@ function buildValidationSchema(people, editingProfile) {
       .required("Name is required")
       .test("unique-name", "Name must be unique", function (value) {
         const v = (value || "").trim().toLowerCase();
-        if (!v) return true; // required() handles empty
+        if (!v) return true;
 
-        // If people not loaded yet, do NOT fail validation
         if (!Array.isArray(people)) return true;
 
         return !people.some((p) => {
@@ -48,7 +43,6 @@ function buildValidationSchema(people, editingProfile) {
           return ((p.name || "").trim().toLowerCase() === v);
         });
       }),
-
     type: Yup.string()
       .oneOf(["income", "expense"], "Type is required")
       .required("Type is required"),
@@ -62,14 +56,10 @@ export default function Category() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
-  // Load categories using SWR
-  const {
-    data: people = [],
-    error,
-    isLoading,
-  } = useSWR("categories", swrFetcher);
+  // Load categories with SWR
+  const { data: people = [], error, isLoading } = useSWR("categories", swrFetcher);
 
-  // Build schema with current state (most reliable)
+  // Build validation schema with current state
   const validationSchema = useMemo(
     () => buildValidationSchema(people, editingProfile),
     [people, editingProfile]
@@ -95,7 +85,7 @@ export default function Category() {
   const handleConfirmDelete = async () => {
     try {
       await deleteCategory(deleteTarget._id || deleteTarget.id);
-      mutate("categories");
+      mutate("categories"); // refresh SWR cache
     } catch (err) {
       console.error("Delete failed:", err);
     } finally {
@@ -104,7 +94,7 @@ export default function Category() {
     }
   };
 
-  // Convert icon to base64
+  // Convert selected file to base64
   const handleIconChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return setIcon("");
@@ -136,7 +126,7 @@ export default function Category() {
         });
       }
 
-      mutate("categories");
+      mutate("categories"); // refresh categories
       resetForm();
       handleClose();
     } catch (err) {
@@ -144,13 +134,13 @@ export default function Category() {
     }
   };
 
-  // Loading & Error States
+  // Loading & error states
   if (isLoading) return <p>Loading categories...</p>;
   if (error) return <p className="text-danger">Failed to load categories.</p>;
 
   return (
     <>
-      {/* Top bar */}
+      {/* Top bar with title and add button */}
       <div className="d-flex align-items-center mb-4 flex-wrap gap-3">
         <div className="me-auto">
           <h4 className="mb-0 fw-semibold text-surface">Categories</h4>
@@ -172,7 +162,7 @@ export default function Category() {
         </Button>
       </div>
 
-      {/* Category Form Modal */}
+      {/* Category form modal */}
       <Modal
         show={show}
         onHide={handleClose}
@@ -204,7 +194,7 @@ export default function Category() {
                     : "Create a new category to better organize your finances."}
                 </p>
 
-                {/* Name */}
+                {/* Name input */}
                 <FormInput
                   label="Name"
                   name="name"
@@ -215,7 +205,7 @@ export default function Category() {
                   labelClassName="required-label fw-bold"
                 />
 
-                {/* Type */}
+                {/* Type toggle */}
                 <TypeToggle
                   name="type"
                   formik={{ values, errors, touched, setFieldValue }}
@@ -271,7 +261,7 @@ export default function Category() {
         </Formik>
       </Modal>
 
-      {/* Delete Confirmation */}
+      {/* Delete confirmation modal */}
       <DeleteConfirmation
         show={showDeleteModal}
         onCancel={() => setShowDeleteModal(false)}
@@ -279,7 +269,7 @@ export default function Category() {
         deleteTarget={deleteTarget}
       />
 
-      {/* List */}
+      {/* Categories list table */}
       <CategoryTable
         category={people}
         onDelete={confirmDelete}
