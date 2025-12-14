@@ -92,26 +92,6 @@ export default function Bar() {
     return {
       theme: {
         baseTheme: "ag-default-dark",
-        overrides: {
-          cartesian: {
-            title: { color: "#e5e7eb", fontSize: 18 },
-            subtitle: { color: "#9ca3af" },
-            legend: { item: { label: { color: "#e5e7eb" } } },
-            axes: {
-              category: {
-                label: { color: "#e5e7eb" },
-                line: { stroke: "#4b5563" },
-                tick: { stroke: "#4b5563" },
-              },
-              number: {
-                label: { color: "#e5e7eb" },
-                line: { stroke: "#4b5563" },
-                tick: { stroke: "#4b5563" },
-                gridLine: { stroke: "#111827" },
-              },
-            },
-          },
-        },
       },
       background: { fill: "#020617" },
       title: { text: "Monthly Income vs Expense" },

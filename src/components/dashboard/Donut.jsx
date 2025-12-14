@@ -51,22 +51,7 @@ export default function Donut({ type }) {
   // -----------------------
   const options = {
     theme: {
-      baseTheme: "ag-default-dark",
-      overrides: {
-        polar: {
-          title: {
-            color: "#e5e7eb",
-            fontSize: 16,
-          },
-          legend: {
-            item: {
-              label: {
-                color: "#e5e7eb",
-              },
-            },
-          },
-        },
-      },
+      baseTheme: "ag-default-dark"
     },
 
     background: {
@@ -112,16 +97,7 @@ export default function Donut({ type }) {
 
     legend: {
       position: "right",
-    },
-
-    tooltip: {
-      renderer: ({ datum }) => ({
-        title: datum.asset,
-        content: `$${datum.amount.toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-        })} (${datum.percentage.toFixed(1)}%)`,
-      }),
-    },
+    }
   };
 
   return <AgCharts options={options} />;

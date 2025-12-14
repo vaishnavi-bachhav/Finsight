@@ -1001,3 +1001,39 @@ body{
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
   color: #e5e7eb;
 }
+
+/* Sidebar */
+/* collapsed sidebar widths feel nice */
+.sidebar-desktop {
+  transition: width 220ms ease, flex-basis 220ms ease;
+}
+
+/* when collapsed, center icons */
+.sidebar-desktop .sidebar-item {
+  display: flex;
+  align-items: center;
+}
+.sidebar-desktop .sidebar-item .me-2 {
+  margin-right: 0.5rem !important;
+}
+.sidebar-desktop .sidebar-item.active {
+  border-radius: 14px;
+}
+
+/* Mobile Offcanvas dark theme */
+.dark-offcanvas {
+  background: #020617;
+  color: #e5e7eb;
+  width: 280px;
+}
+.dark-offcanvas .offcanvas-header .btn-close {
+  filter: invert(1);
+}
+
+/* Optional: make nav items tighter when collapsed */
+@media (min-width: 768px) {
+  .sidebar-desktop .sidebar-item {
+    padding: 0.75rem 1rem;
+  }
+}
+/* -------------------------------------------------- */

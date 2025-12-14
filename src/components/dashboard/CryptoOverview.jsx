@@ -73,23 +73,7 @@ export default function CryptoOverview() {
                 label: { color: "#e5e7eb" },
               },
             },
-          },
-          cartesian: {
-            axes: {
-              category: {
-                label: { color: "#e5e7eb" },
-                line: { stroke: "#4b5563" },
-                tick: { stroke: "#4b5563" },
-                gridLine: { stroke: "#1f2933" },
-              },
-              number: {
-                label: { color: "#e5e7eb" },
-                line: { stroke: "#4b5563" },
-                tick: { stroke: "#4b5563" },
-                gridLine: { stroke: "#1f2933" },
-              },
-            },
-          },
+          }
         },
       },
 
@@ -127,13 +111,7 @@ export default function CryptoOverview() {
           },
         },
       ],
-      legend: { enabled: false },
-      tooltip: {
-        renderer: ({ datum }) => ({
-          title: datum.dateLabel,
-          content: formatUsd(datum.price),
-        }),
-      },
+      legend: { enabled: false }
     };
   }, [chartDataRaw]);
 
