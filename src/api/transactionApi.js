@@ -2,7 +2,7 @@ import api from "./axiosClient.js";
 
 const TRANSACTION_URL = "/transaction";
 
-// GET: grouped transactions
+// GET: fetch all grouped transactions
 export const fetchTransactions = async () => {
   try {
     const response = await api.get(TRANSACTION_URL);
@@ -16,7 +16,7 @@ export const fetchTransactions = async () => {
   }
 };
 
-// POST
+// POST: add a new transaction
 export const addTransaction = async (transaction) => {
   try {
     const res = await api.post(TRANSACTION_URL, transaction);
@@ -30,7 +30,7 @@ export const addTransaction = async (transaction) => {
   }
 };
 
-// PUT
+// PUT: update an existing transaction by ID
 export const updateTransaction = async (id, updates) => {
   try {
     const res = await api.put(`${TRANSACTION_URL}/${id}`, updates);
@@ -44,7 +44,7 @@ export const updateTransaction = async (id, updates) => {
   }
 };
 
-// DELETE
+// DELETE: remove a transaction by ID
 export const deleteTransaction = async (id) => {
   try {
     const res = await api.delete(`${TRANSACTION_URL}/${id}`);

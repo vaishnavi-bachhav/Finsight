@@ -1,12 +1,13 @@
+// src/api/categoryApi.js
+// Category-related API calls
+
 import api from "./axiosClient.js";
 
 const CATEGORY_URL = `/category`;
 
-// -----------------------------
-// GET: all categories
-// -----------------------------
+// Fetch all categories for the logged-in user
 export const fetchCategories = async () => {
-    try {
+  try {
     const response = await api.get(CATEGORY_URL);
     return response.data;
   } catch (error) {
@@ -18,20 +19,13 @@ export const fetchCategories = async () => {
   }
 };
 
-// -----------------------------
-// POST: add new category
-// payload example:
-// { name: "Grocery", icon: "<base64 string>", type: "expense" }
-// -----------------------------
+// Add a new category
 export const addCategory = async (category) => {
   try {
     const res = await api.post(CATEGORY_URL, category);
-    // If your backend returns the inserted document or result:
     return res.data;
   } catch (error) {
     console.error("Failed to add category:", error);
-
-    // Optional: throw a more friendly error for UI
     throw (
       error.response?.data ||
       new Error("Unable to add category. Please try again later.")
@@ -39,12 +33,7 @@ export const addCategory = async (category) => {
   }
 };
 
-
-// -----------------------------
-// PUT: update category
-// updates example:
-// { name: "Food", icon: "...", type: "expense" }
-// -----------------------------
+// Update an existing category
 export const updateCategory = async (id, updates) => {
   try {
     const res = await api.put(`${CATEGORY_URL}/${id}`, updates);
@@ -58,9 +47,7 @@ export const updateCategory = async (id, updates) => {
   }
 };
 
-// -----------------------------
-// DELETE: remove category
-// -----------------------------
+// Delete a category
 export const deleteCategory = async (id) => {
   try {
     const res = await api.delete(`${CATEGORY_URL}/${id}`);

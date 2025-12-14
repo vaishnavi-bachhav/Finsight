@@ -1,7 +1,7 @@
 import api from "./axiosClient";
 
-// backend baseURL already set in axiosClient
+// Fetch inflation data for a given country (default: USA)
 export const fetchInflation = async (country = "USA") => {
   const res = await api.get(`/inflation`, { params: { country } });
-  return res.data; // { latest, series }
+  return res.data; // Returns { latest, series }
 };
