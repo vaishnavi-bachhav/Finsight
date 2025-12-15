@@ -18,7 +18,7 @@ The application is built using **React (Vite)** on the frontend, **Express + Mon
 
 ### 🎥 Demo
 - **Demo Video:**  
-  _Coming soon_  
+  https://drive.google.com/file/d/1zYqno9N7lODbTjs5ay8jK1-XKpI_Fv-W/view?usp=sharing
 
 ---
 
